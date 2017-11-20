@@ -16,8 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+from RiskAnalysis import views as app_views
+
 urlpatterns = [
+    url(r'^$', app_views.home, name='home'),
     url(r'^admin/', admin.site.urls),
-    # url(r'^$', admin.site.urls),
 
 ]

@@ -33,10 +33,10 @@
 
     <div class="row-center">主要P2P平台省份分布</div>
 
-    <script src="js/d3.v3.min.js"></script>
+    <script src="{{ STATIC_URL }}/static/d3.v3.min.js"></script>
     <script>
 
-        d3.json("/platformregion.json", function (err, links) {
+        d3.json("{{ LOCAL_BASED_URL }} /platformregion.json", function (err, links) {
             var color = d3.scale.category20();
 
             var nodes = {};
@@ -55,7 +55,7 @@
                 .nodes(d3.values(nodes))
                 .links(links)
                 .size([width, height])
-                .linkDistance(60)
+                .linkDistance(120)
                 .charge(-300)
                 .on("tick", tick)
                 .start();

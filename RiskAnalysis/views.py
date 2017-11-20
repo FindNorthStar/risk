@@ -1,3 +1,5 @@
+import random
+
 from django.core.serializers import json
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -19,19 +21,24 @@ def platform_region(request):
 
     response_data = '[\n'
 
-    for region,list_business in dict_region.items():
+    for region, list_business in dict_region.items():
         length = len(list_business)
 
         if length == 1:
-            response_data += '{"source":"' + list_business[0] + '","target":"' + list_business[0] + '","region":"' + region + '"},\n'
+            response_data += '{"source":"' + list_business[0] + '","target":"' + list_business[
+                0] + '","region":"' + region + '"},\n'
+            continue
 
         for i in range(length - 1):
             for j in range(i + 1, length):
                 name_i = list_business[i]
                 name_j = list_business[j]
-                response_data+='{"source":"' + name_i + '","target":"' + name_j + '","region":"' + region + '"},\n'
+                if random.randint(0,100) % 10 != 0 and j > 1 and i > 0:
+                    pass
+                else:
+                    response_data += '{"source":"' + name_i + '","target":"' + name_j + '","region":"' + region + '"},\n'
 
-    response_data = response_data[:-2]+'\n'
+    response_data = response_data[:-2] + '\n'
 
     response_data += ']\n'
 
@@ -39,8 +46,8 @@ def platform_region(request):
 
 
 def home(request):
-    list_platform = Platform.objects.all()
-
-    for item in list_platform:
-        print(item.name,item.region)
-    return render(request,'home.html',{'list_platform': list_platform})
+    # list_platform = Platform.objects.all()
+    #
+    # for item in list_platform:
+    #     print(item.name, item.region)
+    return render(request, 'home.html')

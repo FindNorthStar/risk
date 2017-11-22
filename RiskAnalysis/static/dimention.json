@@ -1,0 +1,53 @@
+{"name":"bubble", "children": [
+{"name":"司法信息","description":"Atlas of Global Agriculture",
+"children":[
+    {"name": "破产信息","address":"http://gli.environment.umn.edu", "note":"Global crop geography, including precipitation, temperature, crop area, etc."},
+    {"name": "司法拍卖","address":"http://gli.environment.umn.edu", "note":"Global crop geography, including precipitation, temperature, crop area, etc."},
+    {"name": "失信公告","address":"http://d3js.org"},
+    {"name": "司法曝光公告","address":"http://environment.umn.edu", "note":"Maize, wheat, rice, and soybean yields in 2000"},
+    {"name": "执行公告","address":"http://gli.environment.umn.edu", "note":"Global crop geography, including precipitation, temperature, crop area, etc."},
+    {"name": "裁判文书","address":"http://d3js.org"}
+]},
+{"name": "税务信息", "description": "Virtual Lab of Global Agriculture",
+"children":[
+    {"name":"非正常户口","address":"http://d3js.org","note":"Prototype Infographics on Excess Fertilizer Nutrients"},
+    {"name":"行政处罚","address":"http://d3js.org", "note":"The gap between attainable yields and actual yields, with modeled yields assuming the percentage of gap closed."},
+    {"name":"欠税公告","address":"http://sunsp.net"},
+    {"name":"纳税信用等级","address":"http://sunsp.net"}
+]},
+{"name":"工商信息", "description":"Profiles of Country",
+"children":[
+    {"name":"严重违法","address":"http://d3js.org"},
+    {"name":"工商行政处罚信息","address":"http://d3js.org"},
+    {"name":"经营信息","address":"http://d3js.org"},
+    {"name":"关联信息","address":"http://uis.edu/ens"},
+    {"name":"变更信息","address":"http://d3js.org"},
+    {"name":"工商公示信息","address":"http://d3js.org"},
+    {"name":"企业公示信息","address":"http://uis.edu/ens"}
+]},
+{"name":"经营信息", "description":"Crop Data in 5 minutes grid",
+"children":[
+    {"name":"交易规模","address":"http://www.earthstat.org/"},
+    {"name":"贷款逾期情况","address":"http://www.earthstat.org/"},
+    {"name":"投资人投资情况","address":"http://www.earthstat.org/"},
+    {"name":"贷款人贷款情况","address":"http://www.earthstat.org/"}
+]},
+{"name":"招聘信息", "description":"Crop Data in 5 minutes grid",
+"children":[
+    {"name":"管理层学历分布","address":"http://www.earthstat.org/"},
+    {"name":"招聘学历分布","address":"http://www.earthstat.org/"},
+    {"name":"岗位数量与招聘人数","address":"http://www.earthstat.org/"}
+]},
+{"name":"违规信息", "description":"Crop Data in 5 minutes grid",
+"children":[
+    {"name":"ICP认证","address":"http://www.earthstat.org/"},
+    {"name":"银行存管","address":"http://www.earthstat.org/"},
+    {"name":"央行处罚","address":"http://www.earthstat.org/"},
+    {"name":"银监会处罚","address":"http://www.earthstat.org/"}
+]},
+{"name":"舆情信息", "description":"Crop Data in 5 minutes grid",
+"children":[
+    {"name":"新闻媒体","address":"http://www.earthstat.org/"},
+    {"name":"网络论坛","address":"http://www.earthstat.org/"}
+]}
+]}

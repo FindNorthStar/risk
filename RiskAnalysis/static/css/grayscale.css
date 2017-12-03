@@ -9,7 +9,7 @@ body {
   width: 100%;
   height: 100%;
   color: white;
-  background-color: black; }
+  background-color: white; }
 
 html {
   width: 100%;
@@ -21,6 +21,7 @@ h3,
 h4,
 h5,
 h6 {
+  color: black;
   font-family: 'Cabin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   margin: 0 0 35px;
@@ -120,6 +121,35 @@ a {
       .masthead .intro-body .brand-heading {
         font-size: 100px; }
       .masthead .intro-body .intro-text {
+        font-size: 22px; } }
+
+.totalhead {
+  display: table;
+  width: 100%;
+  height: auto;
+  padding: 200px 0;
+  text-align: center;
+  color: white;
+  background: url("../img/platform.jpg") no-repeat bottom center scroll;
+  background-color: black;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover; }
+  .totalhead .intro-body {
+    display: table-cell;
+    vertical-align: middle; }
+    .totalhead .intro-body .brand-heading {
+      font-size: 50px; }
+    .totalhead .intro-body .intro-text {
+      font-size: 18px; }
+  @media (min-width: 768px) {
+    .totalhead {
+      height: 100%;
+      padding: 0; }
+      .totalhead .intro-body .brand-heading {
+        font-size: 100px; }
+      .totalhead .intro-body .intro-text {
         font-size: 22px; } }
 
 .btn-circle {

@@ -22,71 +22,81 @@
         stroke-width: 1.5px;
     }
 
-
-    .tooltip {
+    .tooltip2 {
         text-decoration: underline;
     }
 
-        .state{
-		fill: none;
-		stroke: #a9a9a9;
-		stroke-width: 1;
-	}
-	.state:hover{
-		fill-opacity:0.5;
-	}
-	#tooltip {
-		position: absolute;
-		text-align: center;
-		padding: 20px;
-		margin: 10px;
-		font: 12px sans-serif;
-		background: lightsteelblue;
-		border: 1px;
-		border-radius: 2px;
-		pointer-events: none;
-	}
-	#tooltip h4{
-		margin:0;
-		font-size:14px;
-	}
-	#tooltip{
-		background:rgba(0,0,0,0.9);
-		border:1px solid grey;
-		border-radius:5px;
-		font-size:12px;
-		width:auto;
-		padding:4px;
-		color:white;
-		opacity:0;
-	}
-	#tooltip table{
-		table-layout:fixed;
-	}
-	#tooltip tr td{
-		padding:0;
-		margin:0;
-	}
-	#tooltip tr td:nth-child(1){
-		width:50px;
-	}
-	#tooltip tr td:nth-child(2){
-		text-align:center;
+    .state {
+        fill: none;
+        stroke: #a9a9a9;
+        stroke-width: 1;
     }
+
+    .state:hover {
+        fill-opacity: 0.5;
+    }
+
+    #tooltip {
+        position: absolute;
+        text-align: center;
+        padding: 20px;
+        margin: 10px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 1px;
+        border-radius: 2px;
+        pointer-events: none;
+    }
+
+    #tooltip h4 {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    #tooltip {
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid grey;
+        border-radius: 5px;
+        font-size: 12px;
+        width: auto;
+        padding: 4px;
+        color: white;
+        opacity: 0;
+    }
+
+    #tooltip table {
+        table-layout: fixed;
+    }
+
+    #tooltip tr td {
+        padding: 0;
+        margin: 0;
+    }
+
+    #tooltip tr td:nth-child(1) {
+        width: 50px;
+    }
+
+    #tooltip tr td:nth-child(2) {
+        text-align: center;
+    }
+
     #mainBubble {
-		background: #fff;
+        background: #fff;
         border: solid 1px #ddd;
-        box-shadow: 0 0 4px rgba(0,0,0,0);
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0);
         font: 10px sans-serif;
         height: 800px;
         position: relative;
         width: 80%;;
     }
+
     #mainBubble svg {
-		left:0;
-        position:absolute;
-        top:0;
+        left: 0;
+        position: absolute;
+        top: 0;
     }
+
     #mainBubble circle.topBubble {
         fill: #aaa;
         stroke: #666;
@@ -95,403 +105,677 @@
 
 </style>
 
-<body>
+<head>
 
-<div id="mainBubble"  style="height: 0px;  border:0px"></div>
-  <script>
-   var w = window.innerWidth;
-   var h = Math.ceil(w*0.7)*1.5;
-   var oR = 0;
-   var nTop = 0;
-    
-   var svgContainer = d3.select("#mainBubble")
-      .style("height", h+"px");
-    
-   var svg = d3.select("#mainBubble").append("svg")
-        .attr("class", "mainBubbleSVG")
-        .attr("width", w)
-        .attr("height",h)
-        .on("mouseleave", function() {return resetBubbles();});
-         
-   var mainNote = svg.append("text")
-    .attr("id", "bubbleItemNote")
-    .attr("x", 10)
-    .attr("y", w/2-15)
-    .attr("font-size", 12)
-    .attr("dominant-baseline", "middle")
-    .attr("alignment-baseline", "middle")
-    .style("fill", "#888888");  
- 
- 
-    d3.json("{{ STATIC_URL }}/static/dimention.json", function(error, root) {
-        var bubbleObj = svg.selectAll(".topBubble")
-                .data(root.children)
-            .enter().append("g")
-                .attr("id", function(d,i) {return "topBubbleAndText_" + i});
-             
-        console.log(root); 
-        nTop = root.children.length;
-        oR = w/(1+3*nTop)*1.2;
- 
-    h = Math.ceil(w/nTop*2)*1.5;
-    svgContainer.style("height",h+"px");
-         
-        var colVals = d3.scale.category10();
-         
-        bubbleObj.append("circle")
-            .attr("class", "topBubble")
-            .attr("id", function(d,i) {return "topBubble" + i;})
-            .attr("r", function(d) { return oR; })
-            .attr("cx", function(d, i) {return oR*(2.5*(1+i)-1);})
-            .attr("cy", function(d, i) {return ((h*((i+1)%2+1))+oR)/3;})
-            .style("fill", function(d,i) { return colVals(i); }) // #1f77b4
-                .style("opacity",0.3)
-            .on("mouseover", function(d,i) {return activateBubble(d,i);});
-         
-             
-        bubbleObj.append("text")
-            .attr("class", "topBubbleText")
-            .attr("x", function(d, i) {return oR*(2.5*(1+i)-1);})
-            .attr("y", function(d, i) {return ((h*((i+1)%2+1))+oR)/3;})
-        .style("fill", function(d,i) { return colVals(i); }) // #1f77b4
-            .attr("font-size", 45)
-            .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .attr("alignment-baseline", "middle")
-            .text(function(d) {return d.name})     
-            .on("mouseover", function(d,i) {return activateBubble(d,i);});
-         
-         
-        for(var iB = 0; iB < nTop; iB++)
-        {
-            var childBubbles = svg.selectAll(".childBubble" + iB)
-                .data(root.children[iB].children)
-                .enter().append("g");
-             
-            childBubbles.append("circle")
-                .attr("class", "childBubble" + iB)
-                .attr("id", function(d,i) {return "childBubble_" + iB + "sub_" + i;})
-                .attr("r",  function(d) {return oR/3.0;})
-                .attr("cx", function(d,i) {return (oR*(2.5*(iB+1)-1) + oR*1.5*Math.cos((i-1)*45/180*3.1415926));})
-                .attr("cy", function(d,i) {return (((h*((iB+1)%2+1))+oR)/3 +        oR*1.5*Math.sin((i-1)*45/180*3.1415926));})
-                .attr("cursor","pointer")
-                .style("opacity",0.5)
-                .style("fill", "#eee")
-                .on("click", function(d,i) {
-                window.open(d.address);                
-              })
-            .on("mouseover", function(d,i) {
-              //window.alert("say something");
-              var noteText = "";
-              if (d.note == null || d.note == "") {
-                noteText = d.address;
-              } else {
-                noteText = d.note;
-              }
-             
-              })
-            .append("svg:title")
-            .text(function(d) { return d.address; });  
- 
-            childBubbles.append("text")
-                .attr("class", "childBubbleText" + iB)
-                .attr("x", function(d,i) {return (oR*(2.5*(iB+1)-1) + oR*1.5*Math.cos((i-1)*45/180*3.1415926));})
-                .attr("y", function(d,i) {return (((h*((iB+1)%2+1))+oR)/3 +        oR*1.5*Math.sin((i-1)*45/180*3.1415926));})
-                .style("opacity",0.5)
-                .attr("text-anchor", "middle")
-            .style("fill", function(d,i) { return colVals(iB); }) // #1f77b4
-                .attr("font-size", 12)
-                .attr("cursor","pointer")
-                .attr("dominant-baseline", "middle")
-            .attr("alignment-baseline", "middle")
-                .text(function(d) {return d.name})     
-                .on("click", function(d,i) {
-                window.open(d.address);
-                });
- 
-        }
- 
-         
-        });
- 
-    resetBubbles = function () {
-      w = window.innerWidth;
-      oR = w/(1+3*nTop)*1.2;
-       
-      h = Math.ceil(w/nTop*2)*1.5;
-      svgContainer.style("height",h+"px");
- 
-      mainNote.attr("y",h-15);
-           
-      svg.attr("width", w);
-      svg.attr("height",h);      
-       
-      //d3.select("#bubbleItemNote").text("D3.js bubble menu developed by Shipeng Sun (sunsp.gis@gmail.com), Institute of Environment, University of Minnesota, and University of Springfield, Illinois.");
-       
-      var t = svg.transition()
-          .duration(650);
-         
-        t.selectAll(".topBubble")
-            .attr("r", function(d) { return oR; })
-            .attr("cx", function(d, i) {return oR*(2.5*(1+i)-1);})
-            .attr("cy", function(d, i) {return ((h*((i+1)%2+1))+oR)/3;});
- 
-        t.selectAll(".topBubbleText")
-        .attr("font-size", 45)
-            .attr("x", function(d, i) {return oR*(2.5*(1+i)-1);})
-            .attr("y", function(d, i) {return ((h*((i+1)%2+1))+oR)/3;});
-     
-      for(var k = 0; k < nTop; k++)
-      {
-        t.selectAll(".childBubbleText" + k)
-                .attr("x", function(d,i) {return (oR*(2.5*(k+1)-1) + oR*1.5*Math.cos((i-1)*45/180*3.1415926));})
-                .attr("y", function(d,i) {return (((h*((k+1)%2+1))+oR)/3 +        oR*1.5*Math.sin((i-1)*45/180*3.1415926));})
-            .attr("font-size", 12)
-                .style("opacity",0.5);
- 
-        t.selectAll(".childBubble" + k)
-                .attr("r",  function(d) {return oR/3.0;})
-            	.style("opacity",0.5)
-                .attr("cx", function(d,i) {return (oR*(2.5*(k+1)-1) + oR*1.5*Math.cos((i-1)*45/180*3.1415926));})
-                .attr("cy", function(d,i) {return (((h*((k+1)%2+1))+oR)/3 +        oR*1.5*Math.sin((i-1)*45/180*3.1415926));});
-                     
-      }  
-    }
-         
-         
-        function activateBubble(d,i) {
-            // increase this bubble and decrease others
-            var t = svg.transition()
-                .duration(d3.event.altKey ? 7500 : 350);
-     
-            t.selectAll(".topBubble")
-                .attr("cx", function(d,ii){
-                    if(i == ii) {
-                        // Nothing to change
-                        return oR*(2.5*(1+ii)-1) - 0.6*oR*(ii-1);
-                    } else {
-                        // Push away a little bit
-                        if(ii < i){
-                            // left side
-                            return oR*0.6*(2.5*(1+ii)-1);
-                        } else {
-                            // right side
-                            return oR*(nTop*2.5+1) - oR*0.6*(2.5*(nTop-ii)-1);
-                        }
-                    }              
-                })
-                .attr("r", function(d, ii) {
-                    if(i == ii)
-                        return oR*1.8;
-                    else
-                        return oR*0.8;
-                    });
-                     
-            t.selectAll(".topBubbleText")
-                .attr("x", function(d,ii){
-                    if(i == ii) {
-                        // Nothing to change
-                        return oR*(2.5*(1+ii)-1) - 0.6*oR*(ii-1);
-                    } else {
-                        // Push away a little bit
-                        if(ii < i){
-                            // left side
-                            return oR*0.6*(2.5*(1+ii)-1);
-                        } else {
-                            // right side
-                            return oR*(nTop*2.5+1) - oR*0.6*(2.5*(nTop-ii)-1);
-                        }
-                    }              
-                })         
-                .attr("font-size", function(d,ii){
-                    if(i == ii)
-                        return 45*1.5;
-                    else
-                        return 12*0.6;             
-                });
-     
-            var signSide = -1;
-            for(var k = 0; k < nTop; k++)
-            {
-                signSide = 1;
-                if(k < nTop/2) signSide = 1;
-                t.selectAll(".childBubbleText" + k)
-                    .attr("x", function(d,i) {return (oR*(2.5*(k+1)-1) - 0.6*oR*(k-1) + signSide*oR*2.5*Math.cos((i-1)*45/180*3.1415926));})
-                    .attr("y", function(d,i) {return (((h*((k+1)%2+1))+oR)/3  + signSide*oR*2.5*Math.sin((i-1)*45/180*3.1415926));})
-                    .attr("font-size", function(){
-                            return (k==i)?12:6;
-                        })
-                    .style("opacity",function(){
-                            return (k==i)?1:0;
-                        });
-                     
-                t.selectAll(".childBubble" + k)
-                    .attr("cx", function(d,i) {return (oR*(2.5*(k+1)-1) - 0.6*oR*(k-1) + signSide*oR*2.5*Math.cos((i-1)*45/180*3.1415926));})
-                    .attr("cy", function(d,i) {return (((h*((k+1)%2+1))+oR)/3  + signSide*oR*2.5*Math.sin((i-1)*45/180*3.1415926));})
-                    .attr("r", function(){
-                            return (k==i)?(oR*0.55):(oR/3.0);              
-                    })
-                    .style("opacity", function(){
-                            return (k==i)?1:0;                 
-                        });
-            }                  
-        }
-     
-    window.onresize = resetBubbles;
-</script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>P2P行业风险分析</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ STATIC_URL }}/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="{{ STATIC_URL }}/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+          type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Cabin:700' rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link href="{{ STATIC_URL }}/static/css/grayscale.min.css" rel="stylesheet">
+
+    <!-- Page level plugin CSS-->
+    <link href="{{ STATIC_URL }}/static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+</head>
 
 
-    <h1 class="QuestionHeader-title" data-reactid="70">主要P2P平台全国各省市分布情况</h1>
+<body id="page-top">
 
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">P2P行业风险分析</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+            Menu
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link js-scroll-trigger" href="#about">风险维度</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link js-scroll-trigger" href="#download">平台分布</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link js-scroll-trigger" href="#contact">平台列表</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
+<!-- Intro Header -->
+<header class="masthead">
+    <div class="intro-body">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <a href="#about" class="btn btn-circle js-scroll-trigger" style="margin-top:210px">
+                        <i class="fa fa-angle-double-down animated"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- About Section -->
+<section id="about" class="content-section text-center" style="padding-top:50px">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1>七大风险维度</h1>
+            </div>
+        </div>
+    </div>
+    <div id="mainBubble" style="height: 0px;  border:0px"></div>
+      
     <script>
+        var w = window.innerWidth;
+        var h = Math.ceil(w * 0.7) * 2;
+        var oR = 0;
+        var nTop = 0;
 
-        d3.json("{{ LOCAL_BASED_URL }} /platformregion.json", function (err, links) {
-            var color = d3.scale.category20();
+        var svgContainer = d3.select("#mainBubble")
+            .style("height", h + "px");
 
-            var nodes = {};
-
-            // 从links计算nodes
-            links.forEach(function (link) {
-                link.source = nodes[link.source] || (nodes[link.source] = { name: link.source, region: link.region });
-                link.target = nodes[link.target] || (nodes[link.target] = { name: link.target, region: link.region });
+        var svg = d3.select("#mainBubble").append("svg")
+            .attr("class", "mainBubbleSVG")
+            .attr("width", w)
+            .attr("height", h)
+            .on("mouseleave", function () {
+                return resetBubbles();
             });
 
-            var width = 1080,
-                height = 800;
+        var mainNote = svg.append("text")
+            .attr("id", "bubbleItemNote")
+            .attr("x", 10)
+            .attr("y", w / 2 - 15)
+            .attr("font-size", 12)
+            .attr("dominant-baseline", "middle")
+            .attr("alignment-baseline", "middle")
+            .style("fill", "#888888");
 
-            // 力布局
-            var force = d3.layout.force()
-                .nodes(d3.values(nodes))
-                .links(links)
-                .size([width, height])
-                .linkDistance(150)
-                .charge(-400)
-                .on("tick", tick)
-                .start();
 
-            var svg = d3.select("#forcesvg");
-
-//            var svg = d3.select("body").append("svg")
-//                .attr("width", width)
-//                .attr("height", height)
-//                .attr("float","right");
-
-            var link = svg.selectAll(".link")
-                .data(force.links())
-                .enter().append("line")
-                .attr("class", "link");
-
-            // 定义tooltip,在svg上加上class g的标签
-            var tooltip = svg.append("g")
-                .attr("class", "tooltip")
-                .style("display", "none");
-
-            tooltip.append("text")
-                .attr("x", 15)
-                .attr("dy", "0 em")
-                .style("font-size", "2.25em")
-                .attr("font-weight", "bold");
-
-            // 添加node及鼠标事件
-            var node = svg.selectAll(".node")
-                .data(force.nodes())
+        d3.json("{{ STATIC_URL }}/static/dimention.json", function (error, root) {
+            var bubbleObj = svg.selectAll(".topBubble")
+                .data(root.children)
                 .enter().append("g")
-                .attr("class", "node")
-                .on("mouseover", mouseover)
-                .on("mouseout", mouseout)
-                .call(force.drag);
-
-            node.append("circle")
-                .style("fill", function (d) {
-                    return color(d.region);
-                })
-                .attr("r", 16);
-
-            node.append("text")
-                .attr("x", 24)
-                .attr("dy", ".35em")
-                .style("font-size", "1.2em")
-                .text(function (d) {
-                    return d.name;
+                .attr("id", function (d, i) {
+                    return "topBubbleAndText_" + i
                 });
 
-            //定义鼠标移到圆形上的操作
-            node.on("mousemove", function (d) {
-                //获取圆形的坐标
-                var xPos = d.x - 50;
-                var yPos = d.y - 45;
-                tooltip.attr("transform", "translate(" + xPos + "," + yPos + ")");
-                tooltip.select("text").text(d.region);
-            });
+            console.log(root);
+            nTop = root.children.length;
+            oR = w / (1 + 3 * nTop) * 1.2;
 
-            function tick() {
-                link
-                    .attr("x1", function (d) {
-                        return d.source.x;
+            h = Math.ceil(w / nTop * 2) * 2;
+            svgContainer.style("height", h + "px");
+
+            var colVals = d3.scale.category10();
+
+            bubbleObj.append("circle")
+                .attr("class", "topBubble")
+                .attr("id", function (d, i) {
+                    return "topBubble" + i;
+                })
+                .attr("r", function (d) {
+                    return oR;
+                })
+                .attr("cx", function (d, i) {
+                    return oR * (2.5 * (1 + i) - 1);
+                })
+                .attr("cy", function (d, i) {
+                    return ((h * ((i + 1) % 2 + 1)) + oR) / 3;
+                })
+                .style("fill", function (d, i) {
+                    return colVals(i);
+                }) // #1f77b4
+                .style("opacity", 0.3)
+                .on("mouseover", function (d, i) {
+                    return activateBubble(d, i);
+                });
+
+
+            bubbleObj.append("text")
+                .attr("class", "topBubbleText")
+                .attr("x", function (d, i) {
+                    return oR * (2.5 * (1 + i) - 1);
+                })
+                .attr("y", function (d, i) {
+                    return ((h * ((i + 1) % 2 + 1)) + oR) / 3;
+                })
+                .style("fill", function (d, i) {
+                    return colVals(i);
+                }) // #1f77b4
+                .attr("font-size", 45)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("alignment-baseline", "middle")
+                .text(function (d) {
+                    return d.name
+                })
+                .on("mouseover", function (d, i) {
+                    return activateBubble(d, i);
+                });
+
+
+            for (var iB = 0; iB < nTop; iB++) {
+                var childBubbles = svg.selectAll(".childBubble" + iB)
+                    .data(root.children[iB].children)
+                    .enter().append("g");
+
+                childBubbles.append("circle")
+                    .attr("class", "childBubble" + iB)
+                    .attr("id", function (d, i) {
+                        return "childBubble_" + iB + "sub_" + i;
                     })
-                    .attr("y1", function (d) {
-                        return d.source.y;
+                    .attr("r", function (d) {
+                        return oR / 3.0;
                     })
-                    .attr("x2", function (d) {
-                        return d.target.x;
+                    .attr("cx", function (d, i) {
+                        return (oR * (2.5 * (iB + 1) - 1) + oR * 1.5 * Math.cos((i - 1) * 45 / 180 * 3.1415926));
                     })
-                    .attr("y2", function (d) {
-                        return d.target.y;
+                    .attr("cy", function (d, i) {
+                        return (((h * ((iB + 1) % 2 + 1)) + oR) / 3 + oR * 1.5 * Math.sin((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("cursor", "pointer")
+                    .style("opacity", 0.5)
+                    .style("fill", "#eee")
+                    .on("click", function (d, i) {
+                        window.open(d.address);
+                    })
+                    .on("mouseover", function (d, i) {
+                        //window.alert("say something");
+                        var noteText = "";
+                        if (d.note == null || d.note == "") {
+                            noteText = d.address;
+                        } else {
+                            noteText = d.note;
+                        }
+
+                    })
+                    .append("svg:title")
+                    .text(function (d) {
+                        return d.address;
                     });
 
-                node
-                    .attr("transform", function (d) {
-                        return "translate(" + d.x + "," + d.y + ")";
+                childBubbles.append("text")
+                    .attr("class", "childBubbleText" + iB)
+                    .attr("x", function (d, i) {
+                        return (oR * (2.5 * (iB + 1) - 1) + oR * 1.5 * Math.cos((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("y", function (d, i) {
+                        return (((h * ((iB + 1) % 2 + 1)) + oR) / 3 + oR * 1.5 * Math.sin((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .style("opacity", 0.5)
+                    .attr("text-anchor", "middle")
+                    .style("fill", function (d, i) {
+                        return colVals(iB);
+                    }) // #1f77b4
+                    .attr("font-size", 12)
+                    .attr("cursor", "pointer")
+                    .attr("dominant-baseline", "middle")
+                    .attr("alignment-baseline", "middle")
+                    .text(function (d) {
+                        return d.name
+                    })
+                    .on("click", function (d, i) {
+                        window.open(d.address);
                     });
+
             }
 
-            function mouseover() {
-                tooltip.style("display", null);
-                d3.select(this).select("circle").transition()
-                    .duration(750)
-                    .attr("r", 20);
-            }
 
-            function mouseout() {
-                tooltip.style("display", "none");
-                d3.select(this).select("circle").transition()
-                    .duration(750)
-                    .attr("r", 16);
-            }
         });
-    </script>
 
-<div id="tooltip"></div><!-- div to hold tooltip. -->
-<svg width="600" height="520" id="statesvg" ></svg> <!-- svg to hold the map. -->
+        resetBubbles = function () {
+            w = window.innerWidth;
+            oR = w / (1 + 3 * nTop) * 1.2;
+
+            h = Math.ceil(w / nTop * 2) * 2;
+            svgContainer.style("height", h + "px");
+
+            mainNote.attr("y", h - 15);
+
+            svg.attr("width", w);
+            svg.attr("height", h);
+
+            //d3.select("#bubbleItemNote").text("D3.js bubble menu developed by Shipeng Sun (sunsp.gis@gmail.com), Institute of Environment, University of Minnesota, and University of Springfield, Illinois.");
+
+            var t = svg.transition()
+                .duration(650);
+
+            t.selectAll(".topBubble")
+                .attr("r", function (d) {
+                    return oR;
+                })
+                .attr("cx", function (d, i) {
+                    return oR * (2.5 * (1 + i) - 1);
+                })
+                .attr("cy", function (d, i) {
+                    return ((h * ((i + 1) % 2 + 1)) + oR) / 3;
+                });
+
+            t.selectAll(".topBubbleText")
+                .attr("font-size", 45)
+                .attr("x", function (d, i) {
+                    return oR * (2.5 * (1 + i) - 1);
+                })
+                .attr("y", function (d, i) {
+                    return ((h * ((i + 1) % 2 + 1)) + oR) / 3;
+                });
+
+            for (var k = 0; k < nTop; k++) {
+                t.selectAll(".childBubbleText" + k)
+                    .attr("x", function (d, i) {
+                        return (oR * (2.5 * (k + 1) - 1) + oR * 1.5 * Math.cos((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("y", function (d, i) {
+                        return (((h * ((k + 1) % 2 + 1)) + oR) / 3 + oR * 1.5 * Math.sin((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("font-size", 12)
+                    .style("opacity", 0.5);
+
+                t.selectAll(".childBubble" + k)
+                    .attr("r", function (d) {
+                        return oR / 3.0;
+                    })
+                    .style("opacity", 0.5)
+                    .attr("cx", function (d, i) {
+                        return (oR * (2.5 * (k + 1) - 1) + oR * 1.5 * Math.cos((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("cy", function (d, i) {
+                        return (((h * ((k + 1) % 2 + 1)) + oR) / 3 + oR * 1.5 * Math.sin((i - 1) * 45 / 180 * 3.1415926));
+                    });
+
+            }
+        }
+
+        function activateBubble(d, i) {
+            // increase this bubble and decrease others
+            var t = svg.transition()
+                .duration(d3.event.altKey ? 7500 : 350);
+
+            t.selectAll(".topBubble")
+                .attr("cx", function (d, ii) {
+                    if (i == ii) {
+                        // Nothing to change
+                        return oR * (2.5 * (1 + ii) - 1) - 0.6 * oR * (ii - 1);
+                    } else {
+                        // Push away a little bit
+                        if (ii < i) {
+                            // left side
+                            return oR * 0.6 * (2.5 * (1 + ii) - 1);
+                        } else {
+                            // right side
+                            return oR * (nTop * 2.5 + 1) - oR * 0.6 * (2.5 * (nTop - ii) - 1);
+                        }
+                    }
+                })
+                .attr("r", function (d, ii) {
+                    if (i == ii)
+                        return oR * 1.8;
+                    else
+                        return oR * 0.8;
+                });
+
+            t.selectAll(".topBubbleText")
+                .attr("x", function (d, ii) {
+                    if (i == ii) {
+                        // Nothing to change
+                        return oR * (2.5 * (1 + ii) - 1) - 0.6 * oR * (ii - 1);
+                    } else {
+                        // Push away a little bit
+                        if (ii < i) {
+                            // left side
+                            return oR * 0.6 * (2.5 * (1 + ii) - 1);
+                        } else {
+                            // right side
+                            return oR * (nTop * 2.5 + 1) - oR * 0.6 * (2.5 * (nTop - ii) - 1);
+                        }
+                    }
+                })
+                .attr("font-size", function (d, ii) {
+                    if (i == ii)
+                        return 45 * 1.5;
+                    else
+                        return 12 * 0.6;
+                });
+
+            var signSide = -1;
+            for (var k = 0; k < nTop; k++) {
+                signSide = 1;
+                if (k < nTop / 2) signSide = 1;
+                t.selectAll(".childBubbleText" + k)
+                    .attr("x", function (d, i) {
+                        return (oR * (2.5 * (k + 1) - 1) - 0.6 * oR * (k - 1) + signSide * oR * 2.5 * Math.cos((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("y", function (d, i) {
+                        return (((h * ((k + 1) % 2 + 1)) + oR) / 3 + signSide * oR * 2.5 * Math.sin((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("font-size", function () {
+                        return (k == i) ? 12 : 6;
+                    })
+                    .style("opacity", function () {
+                        return (k == i) ? 1 : 0;
+                    });
+
+                t.selectAll(".childBubble" + k)
+                    .attr("cx", function (d, i) {
+                        return (oR * (2.5 * (k + 1) - 1) - 0.6 * oR * (k - 1) + signSide * oR * 2.5 * Math.cos((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("cy", function (d, i) {
+                        return (((h * ((k + 1) % 2 + 1)) + oR) / 3 + signSide * oR * 2.5 * Math.sin((i - 1) * 45 / 180 * 3.1415926));
+                    })
+                    .attr("r", function () {
+                        return (k == i) ? (oR * 0.55) : (oR / 3.0);
+                    })
+                    .style("opacity", function () {
+                        return (k == i) ? 1 : 0;
+                    });
+            }
+        }
+
+        window.onresize = resetBubbles;
+    </script>
+</section>
+
+<!-- Download Section -->
+<section id="download" class="download-section1 content-section text-center" style="padding-top:50px">
+    <div class="container">
+        <div class="col-lg-8 mx-auto">
+            <h1>主要P2P平台全国各省市分布情况</h1>
+        </div>
+    </div>
+    <div id="tooltip"></div><!-- div to hold tooltip. -->
+    <svg width="600" height="520" id="statesvg"></svg> <!-- svg to hold the map. -->
+    <div class="container">
+        <div class="col-lg-8 mx-auto">
+            <h1>各主要P2P平台按省市划分聚类情况</h1>
+        </div>
+    </div>
+
+    <svg width="1960" height="800" id="forcesvg">
+        <g id="tooltip2"></g>
+    </svg>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="content-section text-center" style="padding-top:50px">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1>各主要P2P平台风险值列表</h1>
+            </div>
+        </div>
+    </div>
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <!-- Breadcrumbs-->
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">P2P行业风险分析</a>
+                </li>
+                <li class="breadcrumb-item active">P2P平台列表</li>
+            </ol>
+            <!-- Example DataTables Card-->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa fa-table"></i> Data Table Example
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="color:black">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Office</th>
+                                <th>Age</th>
+                                <th>Start date</th>
+                                <th>Salary</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Office</th>
+                                <th>Age</th>
+                                <th>Start date</th>
+                                <th>Salary</th>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            <tr>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
+                                <td>System Architect</td>
+                                <td>Edinburgh</td>
+                                <td>61</td>
+                                <td>2011/04/25</td>
+                                <td>$320,800</td>
+                            </tr>
+                             <tr>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
+                                <td>System Architect</td>
+                                <td>Edinburgh</td>
+                                <td>61</td>
+                                <td>2011/04/25</td>
+                                <td>$320,800</td>
+                            </tr>
+                             <tr>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
+                                <td>System Architect</td>
+                                <td>Edinburgh</td>
+                                <td>61</td>
+                                <td>2011/04/25</td>
+                                <td>$320,800</td>
+                            </tr>
+                             <tr>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
+                                <td>System Architect</td>
+                                <td>Edinburgh</td>
+                                <td>61</td>
+                                <td>2011/04/25</td>
+                                <td>$320,800</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container text-center">
+        <p>Copyright &copy; 166.111.83.80 2017</p>
+    </div>
+</footer>
+
+<!-- Bootstrap core JavaScript -->
+<script src="{{ STATIC_URL }}/static/vendor/jquery/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Plugin JavaScript -->
+<script src="{{ STATIC_URL }}/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Google Maps API Key - Use your own API key to enable the map feature. More information on the Google Maps API can be found at https://developers.google.com/maps/ -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script>
+
+<!-- Custom scripts for this template -->
+<script src="{{ STATIC_URL }}/static/js/grayscale.min.js"></script>
+
+<script src="{{ STATIC_URL }}/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="{{ STATIC_URL }}/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+<!-- Page level plugin JavaScript-->
+<script src="{{ STATIC_URL }}/static/vendor/datatables/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/datatables/dataTables.bootstrap4.js"></script>
+<!-- Custom scripts for all pages-->
+<script src="{{ STATIC_URL }}/static/js/sb-admin.min.js"></script>
+<!-- Custom scripts for this page-->
+<script src="{{ STATIC_URL }}/static/js/sb-admin-datatables.min.js"></script>
+
 
 <script>
-	function tooltipHtml(n, d){	/* function to create html content string in tooltip div. */
-		return "<h4>"+n+"</h4><table>"+
-			"<tr><td>Low</td><td>"+(d.low)+"</td></tr>"+
-			"<tr><td>Average</td><td>"+(d.avg)+"</td></tr>"+
-			"<tr><td>High</td><td>"+(d.high)+"</td></tr>"+
-			"</table>";
-	}
 
-	var sampleData ={};	/* Sample random data. */
-	['JXI', 'LIA', 'TIB', 'NMG', 'SHH', 'CHQ', 'XIN', 'SHD', 'HEN', 'GUD', 'GUI', 'BEJ', 'MAC', 'TAJ', 'HLJ', 'HEB', 'ZHJ', 'ANH', 'GXI', 'HAI', 'JIL', 'SHX', 'HUN', 'YUN', 'FUJ', 'HUB', 'SHA', 'HKG', 'QIH', 'GAN', 'JSU', 'SCH', 'NXA', 'TAI']
-		.forEach(function(d){
-			var low=Math.round(100*Math.random()),
-				mid=Math.round(100*Math.random()),
-				high=Math.round(100*Math.random());
-			sampleData[d]={low:d3.min([low,mid,high]), high:d3.max([low,mid,high]),
-					avg:Math.round((low+mid+high)/3), color:d3.interpolate("#ffffcc", "#800026")(low/100)};
-		});
+    d3.json("{{ LOCAL_BASED_URL }} /platformregion.json", function (err, links) {
+        var color = d3.scale.category20();
+        var nodes = {};
 
-	uStates.draw("#statesvg", sampleData, tooltipHtml);
+        // 从links计算nodes
+        links.forEach(function (link) {
+            link.source = nodes[link.source] || (nodes[link.source] = {name: link.source, region: link.region});
+            link.target = nodes[link.target] || (nodes[link.target] = {name: link.target, region: link.region});
+        });
 
+        var width = 1400,
+            height = 700;
+
+        // 力布局
+        var force = d3.layout.force()
+            .nodes(d3.values(nodes))
+            .links(links)
+            .size([width, height])
+            .linkDistance(90)
+            .charge(-520)
+            .on("tick", tick)
+            .start();
+
+        var svg = d3.select("#forcesvg");
+
+
+        var link = svg.selectAll(".link")
+            .data(force.links())
+            .enter().append("line")
+            .attr("class", "link");
+
+//        // 定义tooltip,在svg上加上class g的标签
+
+        var tooltip = d3.select("#tooltip2");
+
+        tooltip.append("text")
+            .attr("x", 15)
+            .attr("dy", "0 em")
+            .style("font-size", "2.25em")
+            .attr("font-weight", "bold")
+            .style("color", "black");
+
+        // 添加node及鼠标事件
+        var node = svg.selectAll(".node")
+            .data(force.nodes())
+            .enter().append("g")
+            .attr("class", "node")
+            .on("mouseover", mouseover)
+            .on("mouseout", mouseout)
+            .call(force.drag);
+
+        node.append("circle")
+            .style("fill", function (d) {
+                return color(d.region);
+            })
+            .attr("r", 16);
+
+        node.append("text")
+            .attr("x", 24)
+            .attr("dy", ".35em")
+            .style("font-size", "1.2em")
+            .text(function (d) {
+                return d.name;
+            });
+
+        //定义鼠标移到圆形上的操作
+        node.on("mousemove", function (d) {
+            //获取圆形的坐标
+            var xPos = d.x - 50;
+            var yPos = d.y - 25;
+            tooltip.attr("transform", "translate(" + xPos + "," + yPos + ")");
+            tooltip.select("text").text(d.region);
+        });
+
+        function tick() {
+            link
+                .attr("x1", function (d) {
+                    return d.source.x;
+                })
+                .attr("y1", function (d) {
+                    return d.source.y;
+                })
+                .attr("x2", function (d) {
+                    return d.target.x;
+                })
+                .attr("y2", function (d) {
+                    return d.target.y;
+                });
+
+            node
+                .attr("transform", function (d) {
+                    return "translate(" + d.x + "," + d.y + ")";
+                });
+        }
+
+        function mouseover() {
+            tooltip.style("display", null);
+            d3.select(this).select("circle").transition()
+                .duration(750)
+                .attr("r", 20);
+        }
+
+        function mouseout() {
+            tooltip.style("display", "none");
+            d3.select(this).select("circle").transition()
+                .duration(750)
+                .attr("r", 16);
+        }
+    });
 </script>
 
-    <h1 class="QuestionHeader-title" data-reactid="70">各主要P2P平台按省市划分聚类情况</h1>
 
-    <svg width="1080" height="800" id="forcesvg" ></svg>
+<script>
+    function tooltipHtml(n, d) {    /* function to create html content string in tooltip div. */
+        return "<h4 style='color:white'>" + n + "</h4><table>" +
+            "<tr><td>Low</td><td>" + (d.low) + "</td></tr>" +
+            "<tr><td>Average</td><td>" + (d.avg) + "</td></tr>" +
+            "<tr><td>High</td><td>" + (d.high) + "</td></tr>" +
+            "</table>";
+    }
 
-    <h1 class="QuestionHeader-title" data-reactid="70">各主要P2P平台风险值列表</h1>
+    var sampleData = {};
+    /* Sample random data. */
+    ['JXI', 'LIA', 'TIB', 'NMG', 'SHH', 'CHQ', 'XIN', 'SHD', 'HEN', 'GUD', 'GUI', 'BEJ', 'MAC', 'TAJ', 'HLJ', 'HEB', 'ZHJ', 'ANH', 'GXI', 'HAI', 'JIL', 'SHX', 'HUN', 'YUN', 'FUJ', 'HUB', 'SHA', 'HKG', 'QIH', 'GAN', 'JSU', 'SCH', 'NXA', 'TAI']
+        .forEach(function (d) {
+            var low = Math.round(100 * Math.random()),
+                mid = Math.round(100 * Math.random()),
+                high = Math.round(100 * Math.random());
+            sampleData[d] = {
+                low: d3.min([low, mid, high]), high: d3.max([low, mid, high]),
+                avg: Math.round((low + mid + high) / 3), color: d3.interpolate("#ffffcc", "#800026")(low / 100)
+            };
+        });
+
+    uStates.draw("#statesvg", sampleData, tooltipHtml);
+
+</script>
 
 </body>

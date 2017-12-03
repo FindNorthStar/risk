@@ -51,3 +51,10 @@ def home(request):
     # for item in list_platform:
     #     print(item.name, item.region)
     return render(request, 'home.html')
+
+def platform(request):
+    # list_platform = Platform.objects.all()
+    #
+    # for item in list_platform:
+    #     print(item.name, item.region)
+    return render(request, 'platform.html')

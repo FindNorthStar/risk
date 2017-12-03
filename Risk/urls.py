@@ -20,6 +20,7 @@ from RiskAnalysis import views as app_views
 
 urlpatterns = [
     url(r'^$', app_views.home, name='home'),
+    url(r'^platform/', app_views.platform, name='platform'),
     url(r'^platformregion.json$', app_views.platform_region, name='platform_region'),
 
     url(r'^admin/', admin.site.urls),

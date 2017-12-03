@@ -509,7 +509,7 @@
     <div class="container">
         <div class="col-lg-8 mx-auto">
             <h1>各主要P2P平台按省市划分聚类情况</h1>
-        </div>
+        </div> 
     </div>
 
     <svg width="1960" height="800" id="forcesvg">
@@ -545,57 +545,60 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Office</th>
-                                <th>Age</th>
-                                <th>Start date</th>
-                                <th>Salary</th>
+                                <th>平台名称</th>
+                                <th>成交量(万元)</th>
+                                <th>平均参考收益率(%)</th>
+                                <th>平均借款期限(月)</th>
+                                <th>注册资本</th>
+                                <th>满标用时(分)</th>
                             </tr>
                             </thead>
                             <tfoot>
                             <tr>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Office</th>
-                                <th>Age</th>
-                                <th>Start date</th>
-                                <th>Salary</th>
+                                <th>平台名称</th>
+                                <th>成交量(万元)</th>
+                                <th>平均参考收益率(%)</th>
+                                <th>平均借款期限(月)</th>
+                                <th>注册资本</th>
+                                <th>满标用时(分)</th>
                             </tr>
                             </tfoot>
                             <tbody>
+                            {% for bussiness_info in list_wdzj %}
                             <tr>
-                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
-                                <td>System Architect</td>
-                                <td>Edinburgh</td>
-                                <td>61</td>
-                                <td>2011/04/25</td>
-                                <td>$320,800</td>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform">{{ bussiness_info.platform_name }}</a></td>
+                                <td>{{ bussiness_info.amount }}</td>
+                                <td>{{ bussiness_info.incomerate }}</td>
+                                <td>{{ bussiness_info.loanperiod }}</td>
+                                <td>{{ bussiness_info.regcapital }}</td>
+                                <td>{{ bussiness_info.fullloantime }}</td>
                             </tr>
-                             <tr>
-                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
-                                <td>System Architect</td>
-                                <td>Edinburgh</td>
-                                <td>61</td>
-                                <td>2011/04/25</td>
-                                <td>$320,800</td>
-                            </tr>
-                             <tr>
-                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
-                                <td>System Architect</td>
-                                <td>Edinburgh</td>
-                                <td>61</td>
-                                <td>2011/04/25</td>
-                                <td>$320,800</td>
-                            </tr>
-                             <tr>
-                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>
-                                <td>System Architect</td>
-                                <td>Edinburgh</td>
-                                <td>61</td>
-                                <td>2011/04/25</td>
-                                <td>$320,800</td>
-                            </tr>
+                            {% endfor %}
+
+{#                             <tr>#}
+{#                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>#}
+{#                                <td>System Architect</td>#}
+{#                                <td>Edinburgh</td>#}
+{#                                <td>61</td>#}
+{#                                <td>2011/04/25</td>#}
+{#                                <td>$320,800</td>#}
+{#                            </tr>#}
+{#                             <tr>#}
+{#                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>#}
+{#                                <td>System Architect</td>#}
+{#                                <td>Edinburgh</td>#}
+{#                                <td>61</td>#}
+{#                                <td>2011/04/25</td>#}
+{#                                <td>$320,800</td>#}
+{#                            </tr>#}
+{#                             <tr>#}
+{#                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>#}
+{#                                <td>System Architect</td>#}
+{#                                <td>Edinburgh</td>#}
+{#                                <td>61</td>#}
+{#                                <td>2011/04/25</td>#}
+{#                                <td>$320,800</td>#}
+{#                            </tr>#}
                             </tbody>
                         </table>
                     </div>

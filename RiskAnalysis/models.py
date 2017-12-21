@@ -11,17 +11,17 @@ from django.db import models
 
 
 class Abnormaltaxinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     notice_date = models.DateField(blank=True, null=True)
     data_type = models.CharField(max_length=45, blank=True, null=True)
-    identity_id = models.CharField(max_length=45, blank=True, null=True)
-    notice_department = models.CharField(max_length=450, blank=True, null=True)
-    notice_title = models.CharField(max_length=450, blank=True, null=True)
+    identity_id = models.CharField(max_length=450, blank=True, null=True)
     company_name = models.CharField(max_length=250, blank=True, null=True)
+    notice_title = models.CharField(max_length=450, blank=True, null=True)
     notice_type = models.CharField(max_length=45, blank=True, null=True)
+    notice_department = models.CharField(max_length=450, blank=True, null=True)
+    title = models.CharField(max_length=450, blank=True, null=True)
     tax_num = models.CharField(max_length=45, blank=True, null=True)
     legal_person = models.CharField(max_length=45, blank=True, null=True)
-    event_result = models.CharField(max_length=45, blank=True, null=True)
     notice_time = models.CharField(max_length=45, blank=True, null=True)
     abnormal_tax_id = models.AutoField(primary_key=True)
 
@@ -31,7 +31,7 @@ class Abnormaltaxinfo(models.Model):
 
 
 class Administrationpenalty(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     incident_time = models.CharField(max_length=45, blank=True, null=True)
     person_name = models.CharField(max_length=450, blank=True, null=True)
     case_type = models.CharField(max_length=4500, blank=True, null=True)
@@ -65,24 +65,22 @@ class AuthGroup(models.Model):
 
 
 class AuthGroupPermissions(models.Model):
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+    group_id = models.IntegerField()
+    permission_id = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
 
 
 class AuthPermission(models.Model):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+    content_type_id = models.IntegerField()
     codename = models.CharField(max_length=100)
 
     class Meta:
         managed = False
         db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
 
 
 class AuthUser(models.Model):
@@ -103,28 +101,29 @@ class AuthUser(models.Model):
 
 
 class AuthUserGroups(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+    user_id = models.IntegerField()
+    group_id = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
 
 
 class AuthUserUserPermissions(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
+    user_id = models.IntegerField()
+    permission_id = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
 
 
 class Bankdepository(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
+    company_name = models.CharField(max_length=450, blank=True, null=True)
+    website_url = models.CharField(max_length=450, blank=True, null=True)
     is_bank_depository = models.CharField(max_length=45, blank=True, null=True)
+    is_depository = models.CharField(max_length=45, blank=True, null=True)
     platform_id = models.AutoField(primary_key=True)
 
     class Meta:
@@ -133,7 +132,7 @@ class Bankdepository(models.Model):
 
 
 class Branchinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     branch_name = models.CharField(max_length=450, blank=True, null=True)
     branch_register_num = models.CharField(max_length=45, blank=True, null=True)
     register_code = models.CharField(max_length=45, blank=True, null=True)
@@ -185,7 +184,7 @@ class Businessinfo(models.Model):
 
 
 class Businessinvestinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     company_name = models.CharField(max_length=250, blank=True, null=True)
     register_num = models.BigIntegerField(blank=True, null=True)
     credit_code = models.CharField(max_length=45, blank=True, null=True)
@@ -196,7 +195,7 @@ class Businessinvestinfo(models.Model):
     revoke_date = models.CharField(max_length=45, blank=True, null=True)
     business_state = models.CharField(max_length=45, blank=True, null=True)
     register_department = models.CharField(max_length=450, blank=True, null=True)
-    invest_amount = models.FloatField(blank=True, null=True)
+    invest_amount = models.CharField(max_length=45, blank=True, null=True)
     invest_currency = models.CharField(max_length=45, blank=True, null=True)
     invest_percent = models.CharField(max_length=45, blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
@@ -210,7 +209,7 @@ class Businessinvestinfo(models.Model):
 
 
 class Changeinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     change_date = models.DateField(blank=True, null=True)
     change_project = models.CharField(max_length=450, blank=True, null=True)
     change_before_content = models.CharField(max_length=4500, blank=True, null=True)
@@ -223,7 +222,7 @@ class Changeinfo(models.Model):
 
 
 class Company(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     legal_person = models.CharField(max_length=90, blank=True, null=True)
     register_num = models.BigIntegerField(blank=True, null=True)
     company_name = models.CharField(unique=True, max_length=250, blank=True, null=True)
@@ -252,14 +251,25 @@ class Company(models.Model):
     trade_type_code = models.CharField(max_length=45, blank=True, null=True)
     trade_type_code_old = models.CharField(max_length=45, blank=True, null=True)
     trade_type = models.CharField(max_length=450, blank=True, null=True)
-    economy_code = models.IntegerField(blank=True, null=True)
+    economy_code = models.CharField(max_length=90, blank=True, null=True)
     economt_name = models.CharField(max_length=90, blank=True, null=True)
-    change_date = models.DateField(blank=True, null=True)
+    change_date = models.CharField(max_length=90, blank=True, null=True)
     company_id = models.AutoField(primary_key=True)
 
     class Meta:
         managed = False
         db_table = 'company'
+
+
+class CompanyList(models.Model):
+    platform = models.CharField(max_length=450, blank=True, null=True)
+    company = models.CharField(max_length=450, blank=True, null=True)
+    area_code = models.CharField(max_length=10, blank=True, null=True)
+    area = models.CharField(max_length=10, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'company_list'
 
 
 class DjangoAdminLog(models.Model):
@@ -268,8 +278,8 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    content_type_id = models.IntegerField(blank=True, null=True)
+    user_id = models.IntegerField()
 
     class Meta:
         managed = False
@@ -307,20 +317,20 @@ class DjangoSession(models.Model):
 
 
 class Documentexecute(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     case_date = models.DateField(blank=True, null=True)
-    date_type = models.CharField(max_length=15, blank=True, null=True)
-    executed_name = models.CharField(max_length=100, blank=True, null=True)
-    title = models.CharField(max_length=45, blank=True, null=True)
-    case_no = models.CharField(max_length=45, blank=True, null=True)
-    target = models.CharField(max_length=20, blank=True, null=True)
-    content = models.CharField(max_length=500, blank=True, null=True)
     execute_department = models.CharField(max_length=45, blank=True, null=True)
     identify_code = models.CharField(max_length=100, blank=True, null=True)
-    city = models.CharField(max_length=45, blank=True, null=True)
-    province = models.CharField(max_length=45, blank=True, null=True)
-    case_no_old = models.CharField(max_length=45, blank=True, null=True)
+    case_id = models.CharField(db_column='case_Id', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    date_type = models.CharField(max_length=15, blank=True, null=True)
+    executed_name = models.CharField(max_length=100, blank=True, null=True)
+    case_no = models.CharField(max_length=45, blank=True, null=True)
     case_status = models.CharField(max_length=45, blank=True, null=True)
+    target = models.CharField(max_length=20, blank=True, null=True)
+    content = models.CharField(max_length=500, blank=True, null=True)
+    city = models.CharField(max_length=45, blank=True, null=True)
+    title = models.CharField(max_length=45, blank=True, null=True)
+    province = models.CharField(max_length=45, blank=True, null=True)
     release_time = models.CharField(max_length=45, blank=True, null=True)
     document_executidl = models.AutoField(db_column='document_executIdl', primary_key=True)  # Field name made lowercase.
 
@@ -330,37 +340,31 @@ class Documentexecute(models.Model):
 
 
 class Documentjudgment(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     used_name = models.CharField(max_length=45, blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     document_type = models.CharField(max_length=45, blank=True, null=True)
     data_type = models.CharField(max_length=45, blank=True, null=True)
     title = models.CharField(max_length=450, blank=True, null=True)
-    end_date_old = models.CharField(max_length=45, blank=True, null=True)
+    judgementid = models.CharField(db_column='judgementId', max_length=100, blank=True, null=True)  # Field name made lowercase.
     court_name = models.CharField(max_length=200, blank=True, null=True)
     case_no = models.CharField(max_length=100, blank=True, null=True)
-    document_type_old = models.CharField(max_length=45, blank=True, null=True)
-    event_date = models.CharField(max_length=45, blank=True, null=True)
-    court_name_old = models.CharField(max_length=200, blank=True, null=True)
     case_type = models.CharField(max_length=45, blank=True, null=True)
-    money = models.CharField(max_length=200, blank=True, null=True)
-    judg_name = models.CharField(max_length=45, blank=True, null=True)
+    judge_money = models.CharField(max_length=450, blank=True, null=True)
+    judg_name = models.CharField(max_length=450, blank=True, null=True)
     city = models.CharField(max_length=45, blank=True, null=True)
-    title_old = models.CharField(max_length=450, blank=True, null=True)
     case_brief = models.CharField(max_length=100, blank=True, null=True)
     juryman = models.CharField(max_length=450, blank=True, null=True)
     province = models.CharField(max_length=45, blank=True, null=True)
-    case_no_old = models.CharField(max_length=100, blank=True, null=True)
-    judge_result = models.CharField(max_length=3000, blank=True, null=True)
+    judge_result1 = models.CharField(max_length=45, blank=True, null=True)
+    judge_result2 = models.CharField(max_length=3000, blank=True, null=True)
     accordings = models.CharField(max_length=450, blank=True, null=True)
-    court_code = models.CharField(max_length=45, blank=True, null=True)
-    case_fee = models.CharField(max_length=45, blank=True, null=True)
-    start_date = models.CharField(max_length=45, blank=True, null=True)
+    departmentno = models.CharField(max_length=45, blank=True, null=True)
+    event_date = models.CharField(max_length=45, blank=True, null=True)
     process = models.CharField(max_length=25, blank=True, null=True)
-    accuser = models.CharField(max_length=2000, blank=True, null=True)
     third_person = models.CharField(max_length=450, blank=True, null=True)
     clerker = models.CharField(max_length=45, blank=True, null=True)
-    judge_money = models.CharField(max_length=45, blank=True, null=True)
+    accuser = models.CharField(max_length=2000, blank=True, null=True)
     document_judgmentid = models.AutoField(db_column='document_judgmentId', primary_key=True)  # Field name made lowercase.
 
     class Meta:
@@ -369,25 +373,27 @@ class Documentjudgment(models.Model):
 
 
 class Employinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
-    sorttime = models.DateField(db_column='sortTime', blank=True, null=True)  # Field name made lowercase.
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
+    sorttime = models.CharField(db_column='sortTime', max_length=45, blank=True, null=True)  # Field name made lowercase.
     datatype = models.CharField(db_column='dataType', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    title = models.CharField(max_length=200, blank=True, null=True)
     startdate = models.CharField(db_column='startDate', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    recruitn = models.CharField(db_column='recruitN', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    stopdate = models.DateField(db_column='stopDate', blank=True, null=True)  # Field name made lowercase.
-    releasedate = models.DateField(db_column='releaseDate', blank=True, null=True)  # Field name made lowercase.
-    job = models.CharField(max_length=100, blank=True, null=True)
-    jobtype = models.CharField(db_column='jobType', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    salary = models.CharField(max_length=45, blank=True, null=True)
+    stopdate = models.CharField(db_column='stopDate', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    property = models.CharField(max_length=45, blank=True, null=True)
+    province = models.CharField(max_length=45, blank=True, null=True)
+    salary = models.CharField(max_length=100, blank=True, null=True)
+    departmentid = models.CharField(db_column='departmentId', max_length=100, blank=True, null=True)  # Field name made lowercase.
     average_salary = models.CharField(max_length=45, blank=True, null=True)
+    welfare = models.CharField(max_length=100, blank=True, null=True)
+    avg_work_experience = models.CharField(max_length=100, blank=True, null=True)
     trade = models.CharField(max_length=100, blank=True, null=True)
     work_experience = models.CharField(max_length=100, blank=True, null=True)
     education = models.CharField(max_length=45, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
-    company_scale = models.CharField(max_length=45, blank=True, null=True)
-    company_name = models.CharField(max_length=45, blank=True, null=True)
-    employer = models.CharField(max_length=45, blank=True, null=True)
+    company = models.CharField(max_length=100, blank=True, null=True)
+    employer_num = models.CharField(max_length=45, blank=True, null=True)
     employinfoid = models.AutoField(db_column='employInfoId', primary_key=True)  # Field name made lowercase.
+    startmonth = models.CharField(db_column='startMonth', max_length=45, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -395,14 +401,14 @@ class Employinfo(models.Model):
 
 
 class Equitypledged(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     equitypledged_person = models.CharField(max_length=45, blank=True, null=True)
     equitypledged_type = models.CharField(max_length=45, blank=True, null=True)
     equitypledged_money = models.FloatField(blank=True, null=True)
-    equitypledged_record_date = models.DateField(blank=True, null=True)
+    equitypledged_record_date = models.CharField(max_length=45, blank=True, null=True)
     equitypledged_approve_department = models.CharField(max_length=45, blank=True, null=True)
-    equitypledged_approve_date = models.DateField(blank=True, null=True)
-    equitypledged_end_date = models.DateField(blank=True, null=True)
+    equitypledged_approve_date = models.CharField(max_length=45, blank=True, null=True)
+    equitypledged_end_date = models.CharField(max_length=45, blank=True, null=True)
     equitypledgedid = models.AutoField(db_column='equitypledgedId', primary_key=True)  # Field name made lowercase.
 
     class Meta:
@@ -410,22 +416,49 @@ class Equitypledged(models.Model):
         db_table = 'equityPledged'
 
 
+class Failcredit(models.Model):
+    company_name = models.CharField(max_length=450, blank=True, null=True)
+    credit_id = models.AutoField(primary_key=True)
+
+    class Meta:
+        managed = False
+        db_table = 'failCredit'
+
+
 class Freezeinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     freeze_reference_no = models.CharField(max_length=450, blank=True, null=True)
     freeze_department = models.CharField(max_length=100, blank=True, null=True)
-    freeze_start_date = models.DateField(blank=True, null=True)
-    freeze_end_date = models.DateField(blank=True, null=True)
-    freeze_money = models.IntegerField(blank=True, null=True)
+    freeze_start_date = models.CharField(max_length=100, blank=True, null=True)
+    freeze_end_date = models.CharField(max_length=100, blank=True, null=True)
+    freeze_money = models.CharField(max_length=100, blank=True, null=True)
     unfreeze_department = models.CharField(max_length=45, blank=True, null=True)
-    unfreeze_number = models.IntegerField(blank=True, null=True)
-    unfreeze_date = models.DateField(blank=True, null=True)
+    unfreeze_number = models.CharField(max_length=100, blank=True, null=True)
+    unfreeze_date = models.CharField(max_length=100, blank=True, null=True)
     unfreeze_description = models.CharField(max_length=450, blank=True, null=True)
     freezeid = models.AutoField(db_column='freezeId', primary_key=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'freezeInfo'
+
+
+class Guotai(models.Model):
+    fullname = models.CharField(db_column='FullName', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    tradingdate = models.CharField(db_column='TradingDate', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    tradingvolume = models.FloatField(db_column='TradingVolume', blank=True, null=True)  # Field name made lowercase.
+    avereturn = models.FloatField(db_column='AveReturn', blank=True, null=True)  # Field name made lowercase.
+    investornum = models.IntegerField(db_column='InvestorNum', blank=True, null=True)  # Field name made lowercase.
+    avelimtime = models.FloatField(db_column='AveLimTime', blank=True, null=True)  # Field name made lowercase.
+    loannum = models.IntegerField(db_column='LoanNum', blank=True, null=True)  # Field name made lowercase.
+    cumulaterepay = models.FloatField(db_column='CumulateRepay', blank=True, null=True)  # Field name made lowercase.
+    f30repay = models.FloatField(db_column='F30Repay', blank=True, null=True)  # Field name made lowercase.
+    f60repay = models.FloatField(db_column='F60Repay', blank=True, null=True)  # Field name made lowercase.
+    guotaiid = models.AutoField(db_column='guotaiId', primary_key=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'guotai'
 
 
 class Icp(models.Model):
@@ -445,7 +478,7 @@ class Icp(models.Model):
 
 
 class Legalpersoninvestinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     company_name = models.CharField(max_length=250, blank=True, null=True)
     register_num = models.CharField(max_length=45, blank=True, null=True)
     credit_code = models.CharField(max_length=45, blank=True, null=True)
@@ -456,7 +489,7 @@ class Legalpersoninvestinfo(models.Model):
     revoke_date = models.CharField(max_length=45, blank=True, null=True)
     business_state = models.CharField(max_length=45, blank=True, null=True)
     register_department = models.CharField(max_length=450, blank=True, null=True)
-    invest_amount = models.FloatField(blank=True, null=True)
+    invest_amount = models.CharField(max_length=45, blank=True, null=True)
     invest_currency = models.CharField(max_length=45, blank=True, null=True)
     invest_percent = models.CharField(max_length=45, blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
@@ -470,7 +503,7 @@ class Legalpersoninvestinfo(models.Model):
 
 
 class Legalpersonpositioninfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     legal_person_name = models.CharField(max_length=450, blank=True, null=True)
     company_name = models.CharField(max_length=250, blank=True, null=True)
     credit_code = models.CharField(max_length=45, blank=True, null=True)
@@ -493,11 +526,12 @@ class Legalpersonpositioninfo(models.Model):
 
 
 class Liquidation(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     liquidation_person_liable = models.CharField(max_length=45, blank=True, null=True)
     liquidation_responsible_person = models.CharField(max_length=45, blank=True, null=True)
+    liquidation_responsible_person_2 = models.CharField(max_length=45, blank=True, null=True)
     liquidation_completed_situation = models.CharField(max_length=450, blank=True, null=True)
-    liquidation_completed_date = models.DateField(blank=True, null=True)
+    liquidation_completed_date = models.CharField(max_length=45, blank=True, null=True)
     debt_holder = models.CharField(max_length=45, blank=True, null=True)
     creditor_receiver = models.CharField(max_length=45, blank=True, null=True)
     liquidationid = models.AutoField(db_column='liquidationId', primary_key=True)  # Field name made lowercase.
@@ -508,7 +542,7 @@ class Liquidation(models.Model):
 
 
 class Managerinfo(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     manager_name = models.CharField(max_length=450, blank=True, null=True)
     position = models.CharField(max_length=45, blank=True, null=True)
     gender = models.CharField(max_length=45, blank=True, null=True)
@@ -520,12 +554,12 @@ class Managerinfo(models.Model):
 
 
 class News(models.Model):
-    platform_name = models.ForeignKey('Platform', models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     news_time = models.DateField(blank=True, null=True)
     data_type = models.CharField(max_length=45, blank=True, null=True)
-    critical_label = models.CharField(max_length=10000, blank=True, null=True)
     news_title = models.CharField(max_length=10000, blank=True, null=True)
-    platform_id = models.IntegerField(blank=True, null=True)
+    label = models.CharField(max_length=10000, blank=True, null=True)
+    keywords = models.CharField(max_length=1000, blank=True, null=True)
     news_id = models.AutoField(primary_key=True)
 
     class Meta:
@@ -543,9 +577,9 @@ class Platform(models.Model):
 
 
 class Shareholderinfo(models.Model):
-    platform_name = models.ForeignKey(Platform, models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     shareholder_name = models.CharField(max_length=450, blank=True, null=True)
-    share_amount = models.FloatField(blank=True, null=True)
+    share_amount = models.CharField(max_length=45, blank=True, null=True)
     currency = models.CharField(max_length=45, blank=True, null=True)
     invest_date = models.CharField(max_length=45, blank=True, null=True)
     register_date = models.CharField(max_length=45, blank=True, null=True)
@@ -561,15 +595,17 @@ class Shareholderinfo(models.Model):
 
 
 class Taxcreditinfo(models.Model):
-    platform_name = models.ForeignKey(Platform, models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     evaluate_year = models.CharField(max_length=45, blank=True, null=True)
     data_type = models.CharField(max_length=45, blank=True, null=True)
-    notice_department = models.CharField(max_length=450, blank=True, null=True)
-    notice_title = models.CharField(max_length=450, blank=True, null=True)
     company_name = models.CharField(max_length=250, blank=True, null=True)
+    notice_title = models.CharField(max_length=450, blank=True, null=True)
     notice_type = models.CharField(max_length=45, blank=True, null=True)
+    notice_department = models.CharField(max_length=450, blank=True, null=True)
+    title = models.CharField(max_length=450, blank=True, null=True)
     tax_payer_id = models.CharField(max_length=45, blank=True, null=True)
     credit_level = models.CharField(max_length=45, blank=True, null=True)
+    notice_time = models.CharField(max_length=45, blank=True, null=True)
     credit_id = models.AutoField(primary_key=True)
 
     class Meta:
@@ -578,16 +614,16 @@ class Taxcreditinfo(models.Model):
 
 
 class Taxinfo(models.Model):
-    platform_name = models.ForeignKey(Platform, models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     owe_tax_date = models.DateField(blank=True, null=True)
     data_type = models.CharField(max_length=45, blank=True, null=True)
     company_name = models.CharField(max_length=250, blank=True, null=True)
-    notice_type = models.CharField(max_length=45, blank=True, null=True)
-    notice_content = models.CharField(max_length=4500, blank=True, null=True)
-    tax_type = models.CharField(max_length=450, blank=True, null=True)
     notice_title = models.CharField(max_length=450, blank=True, null=True)
-    tax_amount = models.CharField(max_length=45, blank=True, null=True)
-    tax_num = models.CharField(max_length=45, blank=True, null=True)
+    notice_content = models.CharField(max_length=4500, blank=True, null=True)
+    notice_type = models.CharField(max_length=45, blank=True, null=True)
+    tax_type = models.CharField(max_length=450, blank=True, null=True)
+    notice_department = models.CharField(max_length=450, blank=True, null=True)
+    title = models.CharField(max_length=450, blank=True, null=True)
     public_time = models.CharField(max_length=45, blank=True, null=True)
     tax_id = models.AutoField(primary_key=True)
 
@@ -597,15 +633,16 @@ class Taxinfo(models.Model):
 
 
 class Taxpenalty(models.Model):
-    platform_name = models.ForeignKey(Platform, models.DO_NOTHING, db_column='platform_name', blank=True, null=True)
+    platform_name = models.CharField(max_length=45, blank=True, null=True)
     penalty_date = models.DateField(blank=True, null=True)
     data_type = models.CharField(max_length=45, blank=True, null=True)
-    sort_time_string = models.CharField(max_length=45, blank=True, null=True)
+    company_name = models.CharField(max_length=250, blank=True, null=True)
+    notice_title = models.CharField(max_length=450, blank=True, null=True)
     notice_type = models.CharField(max_length=45, blank=True, null=True)
     notice_department = models.CharField(max_length=450, blank=True, null=True)
-    notice_title = models.CharField(max_length=450, blank=True, null=True)
-    company_name = models.CharField(max_length=250, blank=True, null=True)
-    tax_num = models.CharField(max_length=45, blank=True, null=True)
+    title = models.CharField(max_length=450, blank=True, null=True)
+    legal_person = models.CharField(max_length=45, blank=True, null=True)
+    notice_date = models.CharField(max_length=45, blank=True, null=True)
     penalty_id = models.AutoField(primary_key=True)
 
     class Meta:

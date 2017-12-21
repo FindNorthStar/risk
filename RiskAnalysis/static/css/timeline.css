@@ -23,7 +23,7 @@
   color:#c9c9c9;
   box-shadow:0 0 5px 0px #ccc;
 }
-.timeline{
+.timeline2{
   width:100%;
   margin:10px 0px 300px 0px; 
   padding-top:50px;
@@ -32,11 +32,11 @@
   border-bottom:2px solid #f1f1f1;
 
 }
-.timeline:before {
+.timeline2:before {
   content: '';
   display: block;
   position: absolute;
-  left: 49.5%;
+  left: 29.5%;
   top: 120px;
   width: 3px;
   height: 92%;
@@ -60,7 +60,7 @@
 }
 
 .evt:nth-child(even) .in{
-  float:left;
+  float:right;
 }
 .evt:nth-child(odd) .in{
 float:right;
@@ -84,7 +84,7 @@ p{
 .in h2{
   border-radius: 5px 5px 0 0;
   background:#c1c1c1;
-
+  margin-bottom:0px;
 }
 .timeLinedate{
   transition: all 0.2s ease-in-out;
@@ -92,7 +92,7 @@ p{
   width: 9%;
   position: absolute;
   top: 10px;
-  left: 45.2%;
+  left: 25.2%;
   line-height:70px;
   border-radius: 100%;
   font-size: 16px;
@@ -103,9 +103,9 @@ p{
   border: 2px solid #fff;
 }
 .in{
-  width: 40%; 
+  width: 60%;
   float: left;
-  margin: 5px 0 0 0;
+  margin: -1px 0 0 0;
 }
 .activeYear{
   background:#ED473B; 

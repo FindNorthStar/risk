@@ -22,7 +22,17 @@ urlpatterns = [
     url(r'^$', app_views.home, name='home'),
     url(r'^platform/', app_views.platform, name='platform'),
     url(r'^platformregion.json$', app_views.platform_region, name='platform_region'),
-
+    url(r'^businessrelation.json$', app_views.business_relation, name='business_relation'),
+    url(r'^price.json$', app_views.price, name='price'),
+    url(r'^guotaiprice.json$', app_views.guotai_price, name='guotai_price'),
+    url(r'^incomerate.json$', app_views.income_rate, name='income_rate'),
+    url(r'^guotaiincomerate.json$', app_views.guotai_income_rate, name='guotai_income_rate'),
+    url(r'^employseason.json$', app_views.employ_season, name='emoloy_season'),
+    url(r'^employlevel.json$', app_views.employ_level, name='emoloy_level'),
+    url(r'^newswords.json$', app_views.news_words, name='news_words'),
+    url(r'^titlewords.json$', app_views.title_words, name='title_words'),
+    url(r'^judgementprovince.json$', app_views.judgement_province, name='judgement_province'),
+    url(r'^salarylevel.json$', app_views.salary_level, name='salary_level'),
     url(r'^admin/', admin.site.urls),
 
 ]

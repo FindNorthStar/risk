@@ -6,6 +6,19 @@
 <script src="{{ STATIC_URL }}/static/d3.min.js"></script>
 <script src="{{ STATIC_URL }}/static/vendor/jquery/jquery.min.js"></script>
 <script src="{{ STATIC_URL }}/static/js/liquidFillGauge.js" language="JavaScript"></script>
+
+<script src="{{ STATIC_URL }}/static/bubble_chart/d3-transform.js"></script>
+<script src="{{ STATIC_URL }}/static/bubble_chart/extarray.js"></script>
+<script src="http://phuonghuynh.github.io/js/bower_components/cafej/src/misc.js"></script>
+<script src="http://phuonghuynh.github.io/js/bower_components/cafej/src/micro-observer.js"></script>
+<script src="{{ STATIC_URL }}/static/bubble_chart/microplugin.js"></script>
+<script src="{{ STATIC_URL }}/static/bubble_chart/bubble-chart.js"></script>
+<script src="{{ STATIC_URL }}/static/bubble_chart/central-click.js"></script>
+<script src="{{ STATIC_URL }}/static/bubble_chart/lines.js"></script>
+<script src="{{ STATIC_URL }}/static/sentiment.js"></script>
+<script src="{{ STATIC_URL }}/static/dataTables/jquery.dataTables.min.js"></script>
+<script src="{{ STATIC_URL }}/static/dataTables/dataTables.bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}/static/dataTables/dataTables.responsive.js"></script>
 <style>
     .row-center {
         text-align: center;
@@ -112,10 +125,13 @@
         font-family: "Helvetica Neue", Helvetica;
     }
 
-     #dynamic .line {
+    #dynamic .line {
         fill: none;
         stroke: #000;
         stroke-width: 2px;
+    }
+    .btn-danger{
+        margin-top: 5px;
     }
 </style>
 
@@ -126,7 +142,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>XX平台风险分析</title>
+    <title>{{ platform_name }}风险分析</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{{ STATIC_URL }}/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -152,6 +168,18 @@
 
     <link href="{{ STATIC_URL }}/static/css/timeline.css" rel="stylesheet">
 
+    <!-- Morris Charts CSS -->
+    <link href="{{ STATIC_URL }}/static/vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ STATIC_URL }}/static/dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="{{ STATIC_URL }}/static/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="{{ STATIC_URL }}/static/dataTables/dataTables.responsive.css" rel="stylesheet">
+
 </head>
 
 
@@ -160,7 +188,7 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
     <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="#page-top">XX平台风险分析</a>
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">{{ platform_name }}风险分析</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
                 data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -228,9 +256,9 @@
         <div id="sorceSort"></div>
         <label><input type="checkbox">排序</label>
         <div id="totalText" style="float:right; width: 42%; padding-top: 10px">
-            <h4 style="text-align: right">企业法定代表人：贾跃亭</h4>
-            <h4 style="text-align: right">注册资本：1435436.3213万元人民币</h4>
-            <h4 style="text-align: right">经营状态：在营（开业）</h4>
+            <h4 style="text-align: right">企业法定代表人：{{ company_info.legal_person }}</h4>
+            <h4 style="text-align: right">注册资本：{{ company_info.register_capital }}万元人民币</h4>
+            <h4 style="text-align: right">经营状态：{{ company_info.business_state }}</h4>
         </div>
         <script>
 
@@ -379,13 +407,13 @@
 
         var data = [
             [
-                {axis: "舆情", value: 89},
-                {axis: "经营", value: 96},
-                {axis: "工商", value: 80},
-                {axis: "招聘", value: 92},
-                {axis: "税务", value: 99},
-                {axis: "违规", value: 86},
-                {axis: "司法", value: 99},
+                {axis: "舆情", value: {{ news_risk_score }} },
+                {axis: "经营", value: {{ business_risk_score }} },
+                {axis: "工商", value: {{ admin_risk_score }} },
+                {axis: "招聘", value: {{ employ_risk_score }} },
+                {axis: "税务", value: {{ tax_risk_score }} },
+                {axis: "违规", value: {{ outline_risk_score }} },
+                {axis: "司法", value: {{ law_risk_score }} },
             ]
         ];
 
@@ -421,577 +449,22 @@
     <div>
         <h2 style="text-align:left;padding-left: 100px">司法信息</h2>
         <div style="float:left;padding-left: 100px">
-            <button type="button" class="btn btn-primary">破产信息 <span class="badge">0</span></button>
-            <button type="button" class="btn btn-success">司法拍卖 <span class="badge">3</span></button>
-            <button type="button" class="btn btn-danger">司法曝光台 <span class="badge">5</span></button>
-            <button type="button" class="btn btn-danger">失信公告 <span class="badge">5</span></button>
-            <button type="button" class="btn btn-danger">执行公告 <span class="badge">5</span></button>
-            <button type="button" class="btn btn-danger">裁判文书 <span class="badge">5</span></button>
-            <button type="button" class="btn btn-danger">开庭公告 <span class="badge">25</span></button>
-            <button type="button" class="btn btn-danger">法院公告 <span class="badge">53</span></button>
-            <button type="button" class="btn btn-danger">案件流程 <span class="badge">125</span></button>
+            {% for law_type in law_type_info %}
+            <button type="button" class="btn btn-danger">{{ law_type.case_brief }} <span class="badge">{{ law_type.case_count }}</span>
+            </button>
+            {% endfor %}
         </div>
         <svg id="fillgauge2" style="float:right" width="20%" height="200"></svg>
     </div>
     <div id="platform_relation"></div>
     <script>
-        var links = [
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "乐视网信息技术（北京）股份有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "50"
-            },
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "乐视网（天津）信息技术有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "30"
-            },
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "乐视致新电子科技（天津）有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "45"
-            },
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "乐视控股（北京）有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "20"
-            },
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "深圳市创新投资集团有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "32"
-            },
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "乐视体育文化产业发展（北京）有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "38"
-            },
-            {
-                source: "乐视网信息技术（北京）股份有限公司",
-                target: "乐视新媒体文化（天津）有限公司",
-                type: "anim_element remove_on_reload",
-                color: "c6dbef",
-                value: "22"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "破产信息1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "司法拍卖1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "11"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "失信公告1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "9"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "司法曝光公告1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "执行公告1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "18"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "裁判文书1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "破产信息2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "20"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "司法拍卖2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "失信公告2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "21"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "司法曝光公告2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "执行公告2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "22"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "裁判文书2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "破产信息3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "10"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "司法拍卖3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "失信公告3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "8"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "司法曝光公告3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "5"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "执行公告3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "裁判文书3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "18"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "破产信息4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "司法拍卖4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "19"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "失信公告4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "司法曝光公告4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "17"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "执行公告4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "裁判文书4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "12"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "破产信息5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "8"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "司法拍卖5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "失信公告5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "20"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "司法曝光公告5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "5"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "执行公告5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "9"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "裁判文书5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "11"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "破产信息6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "司法拍卖6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "12"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "失信公告6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "司法曝光公告6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "14"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "执行公告6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "裁判文书6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "9"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "破产信息1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "司法拍卖1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "11"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "失信公告1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "9"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "司法曝光公告1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "执行公告1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "18"
-            },
-            {
-                source: "乐视新媒体文化（天津）有限公司",
-                target: "裁判文书1",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "破产信息2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "20"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "司法拍卖2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "失信公告2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "21"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "司法曝光公告2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "执行公告2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "22"
-            },
-            {
-                source: "乐视致新电子科技（天津）有限公司",
-                target: "裁判文书2",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "破产信息3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "10"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "司法拍卖3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "失信公告3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "8"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "司法曝光公告3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "5"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "执行公告3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视控股（北京）有限公司",
-                target: "裁判文书3",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "18"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "破产信息4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "司法拍卖4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "19"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "失信公告4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "司法曝光公告4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "17"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "执行公告4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "深圳市创新投资集团有限公司",
-                target: "裁判文书4",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "12"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "破产信息5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "8"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "司法拍卖5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "失信公告5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "20"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "司法曝光公告5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "5"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "执行公告5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "9"
-            },
-            {
-                source: "乐视体育文化产业发展（北京）有限公司",
-                target: "裁判文书5",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "11"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "破产信息6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "司法拍卖6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "12"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "失信公告6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "司法曝光公告6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "14"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "执行公告6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "15"
-            },
-            {
-                source: "乐视网（天津）信息技术有限公司",
-                target: "裁判文书6",
-                type: "anim_element remove_on_reload",
-                color: "FFB444",
-                value: "9"
-            }
-        ];
 
-        var nodes = {};
+        $.ajax({method:'get',url:'/businessrelation.json'}).done(function (data){
+            linksData = data.link_data;
+
+            var links = linksData;
+
+            var nodes = {};
 
         // Compute the distinct nodes from the links.
         links.forEach(function (link) {
@@ -1014,7 +487,8 @@
             .nodes(d3.values(nodes))
             .links(links)
             .size([width, height])
-            .charge(-1800)
+            .linkDistance(10)
+            .charge(-1300)
             .on("tick", tick)
             .start();
 
@@ -1105,96 +579,95 @@
             return "translate(" + d.x + "," + d.y + ")";
         }
 
+    }).fail();
+
+
     </script>
 
     <div class="judicialDetail" style="padding-top: 50px">
-        <div class="judicialLeft" style="float:left; width:55%">
-        <div id="tooltip"></div><!-- div to hold tooltip. -->
-        <svg width="100%" height="620" id="statesvg" style="float:left;padding-top: 100px"></svg>
+        <div id="judicialLeft" style="float:left; width:55%">
+            <div id="tooltip"></div><!-- div to hold tooltip. -->
+            <svg width="100%" height="620" id="statesvg" style="float:left;padding-top: 100px"></svg>
 
-        <div id="dynamic" style="width:100%"></div>
-    </div>
-        <div style="float:right; width:45%">
+        <div class="col-lg-12" style="float:left">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    关键案件
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>企业名称</th>
+                                <th>发布时间</th>
+                                <th>案件性质</th>
+                                <th>案由</th>
+                                <th>判决结果</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for list_law_item in list_law_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ list_law_item.platform_name }}</td>
+                                <td>{{ list_law_item.end_date }}</td>
+                                <td>{{ list_law_item.document_type }}</td>
+                                <td>{{ list_law_item.case_brief }}</td>
+                                {% if list_law_item.judge_result2|length|get_digit:"-1" > 40 %}
+                                <td>{{ list_law_item.judge_result2|slice:"40" }}...</td>
+                                {% else %}
+                                <td>{{ list_law_item.judge_result2 }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+
+        </div>
+        <div id="judicialRight" style="float:right; width:45%">
             <div class="Timelineheader">司法案件 Timeline
                 <div id="dataYear"></div>
             </div>
             <div class="wrap">
-                <div class="timeline">
-
-                    <div class="year"><h2 class="hyear" align="left">2014</h2>
+                <div class="timeline2">
+                    {% for item in case_info %}
+                    <div class="year"><h2 class="hyear" align="left">{{ item.0 }}</h2>
+                        {% for case_item in item.1 %}
                         <div class="evt">
                             <div class="in">
                                  <span class="timeLinedate">
-                                    <span class="day">21</span>
-                                    <span class="month">May</span>
+                                    <span class="day">{{ case_item.day }}</span>
+                                    <span class="month">{{ case_item.month }}</span>
                                  </span>
-                                <h2>Title</h2>
-                                <p class="data">first</p>
+                                <h2>{{ case_item.brief }}</h2>
+                                <p class="data">{{ case_item.title }}</p>
                             </div>
                         </div>
-                        <div class="evt">
-                            <div class="in">
-                                <span class="timeLinedate">
-                                    <span class="day">02</span>
-                                    <span class="month">Jan</span>
-                                </span>
-                                <h2>Title</h2>
-                                <p class="data">Second</p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
 
-                    <div class="year"><h2 class="hyear" align="left">2014</h2>
-                        <div class="evt">
-                            <div class="in">
-                                 <span class="timeLinedate">
-                                    <span class="day">21</span>
-                                    <span class="month">May</span>
-                                 </span>
-                                <h2>Title</h2>
-                                <p class="data">first</p>
-                            </div>
-                        </div>
-                        <div class="evt">
-                            <div class="in">
-                                <span class="timeLinedate">
-                                    <span class="day">02</span>
-                                    <span class="month">Jan</span>
-                                </span>
-                                <h2>Title</h2>
-                                <p class="data">Second</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="year"><h2 class="hyear" align="left">2014</h2>
-                        <div class="evt">
-                            <div class="in">
-                                 <span class="timeLinedate">
-                                    <span class="day">21</span>
-                                    <span class="month">May</span>
-                                 </span>
-                                <h2>Title</h2>
-                                <p class="data">first</p>
-                            </div>
-                        </div>
-                        <div class="evt">
-                            <div class="in">
-                                <span class="timeLinedate">
-                                    <span class="day">02</span>
-                                    <span class="month">Jan</span>
-                                </span>
-                                <h2>Title</h2>
-                                <p class="data">Second</p>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
 
 
                 </div>
             </div>
         </div>
-        <script>$(function () {
+    </div>
+    <script>$(function () {
             $(window).scroll(function () {
                 $('.year').each(function () {
                     var year = $(this).find('h2').first().text();
@@ -1212,11 +685,16 @@
             $('#dataYear').html(year);
             $('.year').first().find('.timeLinedate').addClass('activeYear');
         });
+        var righteight = document.getElementById('judicialRight').scrollHeight;
+        var lefteight = document.getElementById('judicialLeft').scrollHeight;
+        var judicialDetail = d3.select(".judicialDetail")
+        .style("height", function (d) {
+                    return Math.max(righteight,lefteight)+"px";
+                });
         </script>
-    </div>
 </section>
 
-<section id="commerce" class="content-section text-center" style="padding-top:1300px">
+<section id="commerce" class="content-section text-center" style="padding-top:50px">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -1224,10 +702,223 @@
             </div>
         </div>
     </div>
-    <img src="{{ STATIC_URL }}/static/img/platform_2.JPG" alt="工商分析"/>
-    <a href="#business" class="btn btn-circle js-scroll-trigger" style="margin-top:210px; color:gray">
-        <i class="fa fa-angle-double-down animated"></i>
-    </a>
+    <div class="row">
+        <svg id="fillgauge3" width="20%" height="200"></svg>
+    </div>
+    <div class="row">
+        <div class="col-lg-8" style="float:left; text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    企业照面信息
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">企业名称</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">{{ company_info.company_name }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">法人代表</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">{{ company_info.legal_person }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">工商注册号</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.register_num }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">统一社会信用代码</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.credit_code }}</p1>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">组织机构代码</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.credit_code }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">行业门类代码</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.economy_code }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">国民经济行业名称</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.trade_type_code }}
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">国民经济行业代码</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.trade_type_code_old}}
+                            </p1>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">注册资本(万元)</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.register_capital }}
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">实收资本(万元)</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.paid_in_capital }}
+                            </p1>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">开业日期</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.start_date }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">经营状态</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.business_state }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">经营起始时间</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.business_start_date}}
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">经营截止时间</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.business_end_date }}
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">最后年检年度</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.check_day }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">工商最新变更日期</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.check_day }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">注销日期</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.end_date }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">吊销日期</commercelabel>
+                            <p1 class="help-block" style="width:45%; float:right">{{ company_info.revoke_date }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">企业类型</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">{{ company_info.company_type }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">经营业务范围</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">
+                                {{ company_info.business_scope }}
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">所属行业</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">{{ company_info.trade_type }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">地址</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">{{ company_info.address }}</p1>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:left">
+                        <div class="form-group">
+                            <commercelabel style="padding-top:5px">登记机关</commercelabel>
+                            <p1 class="help-block" style="width:55%; float:right">{{ company_info.register_department}}
+                            </p1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    企业工商信息变更
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>变更日期</th>
+                                <th>变更项目</th>
+                                <th>变更前内容</th>
+                                <th>变更后内容</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for change_item in change_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ change_item.change_date }}</td>
+                                <td>{{ change_item.change_project }}</td>
+                                {% if change_item.change_before_content|length|get_digit:"-1" > 80 %}
+                                <td>{{ change_item.change_before_content|slice:"80" }}...</td>
+                                {% else %}
+                                <td>{{ change_item.change_before_content }}</td>
+                                {% endif %}
+                                {% if change_item.change_after_content|length|get_digit:"-1" > 80 %}
+                                <td>{{ change_item.change_after_content|slice:"80" }}...</td>
+                                {% else %}
+                                <td>{{ change_item.change_after_content }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
 </section>
 
 <section id="business" class="content-section text-center" style="padding-top:50px">
@@ -1238,10 +929,99 @@
             </div>
         </div>
     </div>
-    <img src="{{ STATIC_URL }}/static/img/platform_3.JPG" alt="经营分析"/>
-    <a href="#tax" class="btn btn-circle js-scroll-trigger" style="margin-top:210px; color:gray">
-        <i class="fa fa-angle-double-down animated"></i>
-    </a>
+    <div class="row">
+        <svg id="fillgauge4" width="20%" height="200"></svg>
+    </div>
+
+     <div class="row">
+        <div class="col-lg-12" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    税务非正常户
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>平台名称</th>
+                                <th>成交量（万元）</th>
+                                <th>平均参考收益率（%）</th>
+                                <th>平均借款期限（月）</th>
+                                <th>净资金流入（万元）</th>
+                                <th>待还余款（万元）</th>
+                                <th>满标用时（分）</th>
+                                <th>注册资本（万元）</th>
+                                <th>运营时间（月）</th>
+                                <th>开始日期</th>
+                                <th>截止日期</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for wdzj_item in wdzj_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ wdzj_item.platform_name }}</td>
+                                <td>{{ wdzj_item.amount }}</td>
+                                <td>{{ wdzj_item.incomerate }}</td>
+                                <td>{{ wdzj_item.loanperiod }}</td>
+                                <td>{{ wdzj_item.netinflowofthirty }}</td>
+                                <td>{{ wdzj_item.staystilloftotal }}</td>
+                                <td>{{ wdzj_item.fullloantime }}</td>
+                                <td>{{ wdzj_item.regcapital }}</td>
+                                <td>{{ wdzj_item.timeoperation }}</td>
+                                <td>{{ wdzj_item.startdate }}</td>
+                                <td>{{ wdzj_item.enddate }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+     <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Multiple Axes Line Chart Example
+                </div>
+                <div class="panel-body">
+                    <div class="flot-chart">
+                        <div class="flot-chart-content" id="flot-line-chart-multi"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Moving Line Chart Example
+                </div>
+                <div class="panel-body">
+                    <div class="flot-chart">
+                        <div class="flot-chart-content" id="flot-line-chart-moving"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="text-align:center">
+        <div id="dynamic" style="width:100%; margin:0 auto"></div>
+    </div>
+
 </section>
 
 <section id="tax" class="content-section text-center" style="padding-top:50px">
@@ -1252,10 +1032,212 @@
             </div>
         </div>
     </div>
-    <img src="{{ STATIC_URL }}/static/img/platform_4.JPG" alt="税务分析"/>
-    <a href="#sentiment" class="btn btn-circle js-scroll-trigger" style="margin-top:210px; color:gray">
-        <i class="fa fa-angle-double-down animated"></i>
-    </a>
+    <div class="row">
+        <svg id="fillgauge5" width="20%" height="200"></svg>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    纳税信用等级
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>企业名称</th>
+                                <th>评价年份</th>
+                                <th>当事人</th>
+                                <th>管理机关</th>
+                                <th>标题</th>
+                                <th>事件结果</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for tax_credit_item in tax_credit_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ tax_credit_item.platform_name }}</td>
+                                <td>{{ tax_credit_item.evaluate_year }}</td>
+                                <td>{{ tax_credit_item.company_name }}</td>
+                                <td>{{ tax_credit_item.notice_department }}</td>
+                                <td>{{ tax_credit_item.notice_title }}</td>
+                                <td>{{ tax_credit_item.credit_level }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    欠税公告
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>企业名称</th>
+                                <th>欠税日期</th>
+                                <th>当事人</th>
+                                <th>税种</th>
+                                <th>管理机关</th>
+                                <th>标题</th>
+                                <th>发布时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for tax_item in tax_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ tax_item.platform_name }}</td>
+                                <td>{{ tax_item.owe_tax_date }}</td>
+                                <td>{{ tax_item.company_name }}</td>
+                                <td>{{ tax_item.tax_type }}</td>
+                                <td>{{ tax_item.notice_department }}</td>
+                                <td>{{ tax_item.notice_title }}</td>
+                                <td>{{ tax_item.public_time }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    涉税处罚公示
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>企业名称</th>
+                                <th>处罚生效日期</th>
+                                <th>当事人</th>
+                                <th>事件类型</th>
+                                <th>管理机关</th>
+                                <th>标题</th>
+                                <th>法人代表</th>
+                                <th>发布时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for tax_penalty_item in tax_penalty_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ tax_penalty_item.platform_name }}</td>
+                                <td>{{ tax_penalty_item.penalty_date }}</td>
+                                <td>{{ tax_penalty_item.company_name }}</td>
+                                <td>{{ tax_penalty_item.notice_type }}</td>
+                                <td>{{ tax_penalty_item.notice_department }}</td>
+                                <td>{{ tax_penalty_item.notice_title }}</td>
+                                <td>{{ tax_penalty_item.legal_person }}</td>
+                                <td>{{ tax_penalty_item.notice_date }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    税务非正常户
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>企业名称</th>
+                                <th>认定日期</th>
+                                <th>当事人</th>
+                                <th>事件名称</th>
+                                <th>管理机关</th>
+                                <th>标题</th>
+                                <th>法人代表</th>
+                                <th>发布时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for abnormal_tax_item in abnormal_tax_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ abnormal_tax_item.platform_name }}</td>
+                                <td>{{ abnormal_tax_item.notice_date }}</td>
+                                <td>{{ abnormal_tax_item.company_name }}</td>
+                                <td>{{ abnormal_tax_item.notice_title }}</td>
+                                <td>{{ abnormal_tax_item.notice_department }}</td>
+                                <td>{{ abnormal_tax_item.title }}</td>
+                                <td>{{ abnormal_tax_item.legal_person }}</td>
+                                <td>{{ abnormal_tax_item.notice_time }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
 </section>
 
 <section id="sentiment" class="content-section text-center" style="padding-top:50px">
@@ -1266,10 +1248,129 @@
             </div>
         </div>
     </div>
-    <img src="{{ STATIC_URL }}/static/img/platform_5.JPG" alt="舆情分析"/>
-    <a href="#out_line" class="btn btn-circle js-scroll-trigger" style="margin-top:210px; color:gray">
-        <i class="fa fa-angle-double-down animated"></i>
-    </a>
+
+    <div class="row">
+        <svg id="fillgauge6" width="20%" height="200"></svg>
+        <div class="bubbleChart" style="float:right;padding-left: 10%"></div>
+    </div>
+
+    <div id="wordCloud">
+    </div>
+
+    <script src="{{ STATIC_URL }}/static/wordcloud/d3.layout.cloud.js"></script>
+
+    <script>
+
+
+        $.ajax({method: 'get', url: '/newswords.json'}).done(function (data) {
+
+            var fill = d3.scale.category20();
+
+        wordsList = data.words;
+
+        var layout = d3.layout.cloud()
+            .size([1080, 600])
+            .words(wordsList.map(function (d) {
+                return {text: d[0], size: 20 + d[1]};
+            }))
+            .padding(5)
+            .rotate(function () {
+                return ~~(Math.random() * 2) * 90;
+            })
+            .font("Impact")
+            .fontSize(function (d) {
+                return d.size;
+            })
+            .on("end", draw);
+
+        layout.start();
+
+        function draw(words) {
+            d3.select("#wordCloud").append("svg")
+                .attr("width", layout.size()[0])
+                .attr("height", layout.size()[1])
+                .append("g")
+                .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", "Impact")
+                .style("fill", function (d, i) {
+                    return fill(i);
+                })
+                .attr("text-anchor", "middle")
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+        }
+
+    }).fail();
+
+    </script>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    新闻舆论
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>平台名称</th>
+                                <th>发布时间</th>
+                                <th>关键标签</th>
+                                <th>标题</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for news_item in news_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ news_item.platform_name }}</td>
+                                <td>{{ news_item.news_time }}</td>
+                                {% if news_item.label|length|get_digit:"-1" > 80 %}
+                                <td>{{ news_item.label|slice:"30" }}...</td>
+                                {% else %}
+                                <td>{{ news_item.label }}</td>
+                                {% endif %}
+
+                                {% if news_item.news_title|length|get_digit:"-1" > 80 %}
+                                <td>{{ news_item.news_title|slice:"30" }}...</td>
+                                {% else %}
+                                <td>{{ news_item.news_title }}</td>
+                                {% endif %}
+
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+    <!--<a href="#out_line" class="btn btn-circle js-scroll-trigger" style="margin-top:210px; color:gray">-->
+    <!--<i class="fa fa-angle-double-down animated"></i>-->
+    <!--</a>-->
 </section>
 
 <!-- Download Section -->
@@ -1281,10 +1382,105 @@
             </div>
         </div>
     </div>
-    <img src="{{ STATIC_URL }}/static/img/platform_6.JPG" alt="违规分析"/>
-    <a href="#employee" class="btn btn-circle js-scroll-trigger" style="margin-top:210px; color:gray">
-        <i class="fa fa-angle-double-down animated"></i>
-    </a>
+    <div class="row">
+        <svg id="fillgauge7" width="20%" height="200"></svg>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    银行存管信息
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>主体企业</th>
+                                <th>链接</th>
+                                <th>是否包含银行存管</th>
+                                <th>是否包含存管</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for bank_depository_item in bank_depository_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ bank_depository_item.company_name }}</td>
+                                <td>{{ bank_depository_item.website_url }}</td>
+                                <td>{{ bank_depository_item.is_bank_depository }}</td>
+                                <td>{{ bank_depository_item.is_depository }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    ICP信息
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>单位名称</th>
+                                <th>主办单位性质</th>
+                                <th>网站备案</th>
+                                <th>网站名称</th>
+                                <th>网站首页网址</th>
+                                <th>审核时间</th>
+                                <th>是否限制接入</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for icp_item in icp_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ icp_item.company_name }}</td>
+                                <td>{{ icp_item.company_type }}</td>
+                                <td>{{ icp_item.licence_num }}</td>
+                                <td>{{ icp_item.website_name }}</td>
+                                <td>{{ icp_item.website_url }}</td>
+                                <td>{{ icp_item.examine_date }}</td>
+                                <td>{{ icp_item.is_restriction }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+
 </section>
 
 <section id="employee" class="content-section text-center" style="padding-top:50px">
@@ -1295,7 +1491,233 @@
             </div>
         </div>
     </div>
-    <img src="{{ STATIC_URL }}/static/img/platform_7.JPG" alt="招聘分析"/>
+
+    <div class="row">
+        <svg id="fillgauge8" width="20%" height="200"></svg>
+        <div id="employee_radar"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color:black">
+                    Area Chart Example
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div id="morris-area-chart"></div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color:black">
+                    Donut Chart Example
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div id="morris-donut-chart"></div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+
+    <script>
+
+
+
+        $.ajax({method:'get',url:'/salarylevel.json'}).done(function (data){
+            salary = data.salary_data;
+
+            var width = 960,
+            height = 800,
+            radius = Math.min(width, height) / 1.9,
+            spacing = .08;
+
+        var color = d3.scale.linear()
+            .range(["hsl(-180,50%,50%)", "hsl(180,50%,50%)"])
+            .interpolate(interpolateHsl);
+
+        var arc = d3.svg.arc()
+            .startAngle(0.0)
+            .endAngle(function (d) {
+                return (d.value * 2 * Math.PI);
+            })
+            .innerRadius(function (d) {
+                return d.index * radius;
+            })
+            .outerRadius(function (d) {
+                return (d.index + spacing) * radius;
+            });
+        var formatter = d3.format(".2%");
+        var svg = d3.select("#employee_radar").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var gradient = svg
+            .selectAll("linearGradient").data(fields).enter()
+            .append("linearGradient")
+            .attr("y1", "0%")
+            .attr("y2", "0%")
+            .attr("x1", "0%")
+            .attr("x2", "100%")
+            .attr("gradientUnits", "objectBoundingBox")
+            .attr('id', function (d) {
+                return "gradient-" + d.index * 10
+            })
+        gradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-opacity", "1")
+            .attr("stop-color", function (d) {
+                return color(d.index);
+            });
+        gradient.append("stop")
+            .attr("offset", function (d) {
+                return 30 + "%"
+            })
+            .attr("stop-opacity", ".5")
+            .attr("stop-color", function (d) {
+                return color(d.index);
+            });
+        gradient.append("stop")
+            .attr("offset", function (d) {
+                return 80 + "%"
+            })
+            .attr("stop-opacity", "0.7")
+            .attr("stop-color", function (d) {
+                return color(d.index);
+            });
+
+
+        var field = svg.selectAll("g")
+            .data(fields)
+            .enter().append("g");
+
+        field.append("path");
+        field.append("rect");
+        field.append("text");
+
+        d3.transition().duration(0).each(tick);
+        d3.select(self.frameElement).style("height", height + "px");
+
+
+
+        function tick() {
+             var salaryArray = ['0-5k','5k-10k','10k-15k','15k-20k','>20k'];
+
+            field = field
+                .each(function (d) {
+                    this._value = d.value;
+                })
+                .data(fields)
+                .each(function (d) {
+                    d.previousValue = this._value;
+                });
+            field.select("path")
+                .transition()
+                .ease("linear")
+                .attrTween("d", arcTween)
+                .style("opacity", function (d) {
+                    return .7;
+                })
+                .style("fill", function (d) {
+                    return color(d.index);
+                });
+            field.select("text")
+                .attr("x", function (d) {
+                    return -( ((fields().length / 10) + spacing) * radius) - 50;
+                })
+                .attr("y", function (d) {
+                    return -(((d.index + spacing) * radius)) + 20;
+                })
+                .text(function (d,i) {
+                    return salaryArray[i]+' : '+formatter(d.value);
+                })
+                .style("font-size", "15px")
+                .transition()
+                .ease("linear")
+                .attr("transform", function (d) {
+                    return "rotate(0)"
+                        + "translate(0,0)"
+                        + "rotate(0)"
+                });
+            field.select("rect")
+                .attr("x", function (d) {
+                    return -( ((fields().length / 10) + spacing) * radius) - 100;
+                })
+                .attr("y", function (d) {
+                    return -(((d.index + spacing) * radius));
+                })
+                .attr("height", function (d) {
+                    return ((d.index + spacing) * radius) - (d.index * radius)
+                })
+                .attr("width", function (d) {
+                    return ((fields().length / 10) + spacing) * radius + 90;
+                })
+                .text(function (d) {
+                    return formatter(d.value);
+                })
+                .attr("fill", function (d) {
+                    return "url(#gradient-" + d.index * 10 + ")"
+                })
+                .transition()
+                .attr("transform", function (d) {
+                    return "rotate(0)"
+                        + "translate(0,0)"
+                        + "rotate(0)"
+                });
+
+            setTimeout(tick, 3000);
+        }
+
+        function arcTween(d) {
+            var i = d3.interpolateNumber(d.previousValue, d.value);
+            return function (t) {
+                d.value = i(t);
+                return arc(d);
+            };
+        }
+            function fields() {
+            var temp = 1.0;
+            salary[3] = Math.random()*temp;
+            temp = temp - salary[3];
+            salary[2] = Math.random()*temp;
+            temp = temp - salary[2];
+            salary[1] = Math.random()*temp;
+            temp = temp - salary[1];
+            salary[4] = Math.random()*temp;
+            temp = temp - salary[4];
+            salary[0] = Math.random()*temp;
+            temp = temp - salary[0];
+            return [
+                {index: .1, value: salary[0]},
+                {index: .2, value: salary[1]},
+                {index: .3, value: salary[2]},
+                {index: .4, value: salary[3]},
+                {index: .5, value: salary[4]}
+            ];
+        }
+
+        // Avoid shortest-path interpolation.
+        function interpolateHsl(a, b) {
+            var i = d3.interpolateString(a, b);
+            return function (t) {
+                return d3.hsl(i(t));
+            };
+        }
+
+    }).fail();
+
+
+    </script>
+
 </section>
 
 
@@ -1315,6 +1737,19 @@
 <!-- Custom scripts for this template -->
 <script src="{{ STATIC_URL }}/static/js/grayscale.min.js"></script>
 
+<!-- Morris Charts JavaScript -->
+<script src="{{ STATIC_URL }}/static/vendor/raphael/raphael.min.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/morrisjs/morris.min.js"></script>
+<script src="{{ STATIC_URL }}/static/data/morris-data.js"></script>
+
+<!-- Flot Charts JavaScript -->
+<script src="{{ STATIC_URL }}/static/vendor/flot/excanvas.min.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/flot/jquery.flot.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/flot/jquery.flot.pie.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/flot/jquery.flot.resize.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/flot/jquery.flot.time.js"></script>
+<script src="{{ STATIC_URL }}/static/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+<script src="{{ STATIC_URL }}/static/data/flot-data.js"></script>
 
 <script language="JavaScript">
     var config1 = liquidFillGaugeDefaultSettings();
@@ -1330,54 +1765,72 @@
     config1.waveCount = 1;
     config1.textSize = 2.1;
     config1.displayPercent = false;
-    var gauge1 = loadLiquidFillGauge("fillgauge1", 55, config1);
-    var gauge1 = loadLiquidFillGauge("fillgauge2", 92, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge1", {{ total_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge2", {{ law_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge3", {{ admin_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge4", {{ business_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge5", {{ tax_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge6", {{ news_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge7", {{ outline_risk_score }}, config1);
+    var gauge1 = loadLiquidFillGauge("fillgauge8", {{ employ_risk_score }}, config1);
 </script>
 
 
 <script>
-    function tooltipHtml(n, d) {    /* function to create html content string in tooltip div. */
+
+    $.ajax({method:'get',url:'/judgementprovince.json'}).done(function (data){
+
+        provinceCount = data.province_count;
+
+
+        function tooltipHtml(n, d) {    /* function to create html content string in tooltip div. */
         return "<h4 style='color:white'>" + n + "</h4><table>" +
-            "<tr><td>Low</td><td>" + (d.low) + "</td></tr>" +
             "<tr><td>Average</td><td>" + (d.avg) + "</td></tr>" +
-            "<tr><td>High</td><td>" + (d.high) + "</td></tr>" +
             "</table>";
     }
 
     var sampleData = {};
-    /* Sample random data. */
+    var nums = provinceCount;
     ['JXI', 'LIA', 'TIB', 'NMG', 'SHH', 'CHQ', 'XIN', 'SHD', 'HEN', 'GUD', 'GUI', 'BEJ', 'MAC', 'TAJ', 'HLJ', 'HEB', 'ZHJ', 'ANH', 'GXI', 'HAI', 'JIL', 'SHX', 'HUN', 'YUN', 'FUJ', 'HUB', 'SHA', 'HKG', 'QIH', 'GAN', 'JSU', 'SCH', 'NXA', 'TAI']
-        .forEach(function (d) {
-            var low = Math.round(100 * Math.random()),
-                mid = Math.round(100 * Math.random()),
-                high = Math.round(100 * Math.random());
+        .forEach(function (d,i) {
+//            alert(nums[i]);
+            var low = nums[i],
+                mid = nums[i],
+                high = nums[i];
+            var value = nums[i];
+            if (value>20){
+                value = 20
+            }
             sampleData[d] = {
-                low: d3.min([low, mid, high]), high: d3.max([low, mid, high]),
-                avg: Math.round((low + mid + high) / 3), color: d3.interpolate("#ffffcc", "#800026")(low / 100)
+                avg: Math.round((low + mid + high) / 3), color: d3.interpolate("#ffffcc", "#700000")(value / 20)
             };
         });
 
     uStates.draw("#statesvg", sampleData, tooltipHtml);
+
+    }).fail()
+
+
 
 </script>
 
 <script>
 
     var m = [20, 20, 30, 20],
-        w = 720 - m[1] - m[3],
+        w = 1000 - m[1] - m[3],
         h = 550 - m[0] - m[2];
 
     var x,
         y,
         duration = 1500,
-        delay = 500;
+        delay = 600;
 
     var color = d3.scale.category10();
 
     var svg = d3.select("#dynamic").append("svg")
         .attr("width", w + m[1] + m[3])
         .attr("height", h + m[0] + m[2])
-        .style("float","left")
+//        .style("float", "left")
         .append("g")
         .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
@@ -1413,6 +1866,9 @@
         });
 
     d3.csv("{{ STATIC_URL }}/static/data/stocks.csv", function (data) {
+
+        {#console.log(data);#}
+
         var parse = d3.time.format("%b %Y").parse;
 
         // Nest stock values by symbol.

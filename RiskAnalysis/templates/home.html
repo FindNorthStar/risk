@@ -39,7 +39,7 @@
     #tooltip {
         position: absolute;
         text-align: center;
-        padding: 20px;
+        /*padding: 20px;*/
         margin: 10px;
         font: 12px sans-serif;
         background: lightsteelblue;
@@ -509,7 +509,7 @@
     <div class="container">
         <div class="col-lg-8 mx-auto">
             <h1>各主要P2P平台按省市划分聚类情况</h1>
-        </div> 
+        </div>
     </div>
 
     <svg width="1960" height="800" id="forcesvg">
@@ -566,7 +566,7 @@
                             <tbody>
                             {% for bussiness_info in list_wdzj %}
                             <tr>
-                                <td><a href="{{ LOCAL_BASED_URL }} /platform">{{ bussiness_info.platform_name }}</a></td>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform?id={{ bussiness_info.wdzjinfoid }}">{{ bussiness_info.platform_name }}</a></td>
                                 <td>{{ bussiness_info.amount }}</td>
                                 <td>{{ bussiness_info.incomerate }}</td>
                                 <td>{{ bussiness_info.loanperiod }}</td>
@@ -653,7 +653,7 @@
             link.target = nodes[link.target] || (nodes[link.target] = {name: link.target, region: link.region});
         });
 
-        var width = 1400,
+        var width = document.body.clientWidth,
             height = 700;
 
         // 力布局
@@ -662,7 +662,7 @@
             .links(links)
             .size([width, height])
             .linkDistance(90)
-            .charge(-520)
+            .charge(-300)
             .on("tick", tick)
             .start();
 
@@ -758,22 +758,25 @@
 <script>
     function tooltipHtml(n, d) {    /* function to create html content string in tooltip div. */
         return "<h4 style='color:white'>" + n + "</h4><table>" +
-            "<tr><td>Low</td><td>" + (d.low) + "</td></tr>" +
-            "<tr><td>Average</td><td>" + (d.avg) + "</td></tr>" +
-            "<tr><td>High</td><td>" + (d.high) + "</td></tr>" +
+            "<tr><td>平台数量</td><td>" + (d.avg) + "</td></tr>" +
             "</table>";
     }
 
     var sampleData = {};
     /* Sample random data. */
+    var nums = [19 , 5 , 0 , 2 , 115 , 12 , 5 , 40 , 16 , 218 , 9 , 151 , 0 , 2 , 4 , 9 , 93 , 26 , 3 , 0 , 3 , 3 , 12 , 7 , 26 , 36 , 8 , 0 , 0 , 2 , 31 , 24 , 3 , 0];
     ['JXI', 'LIA', 'TIB', 'NMG', 'SHH', 'CHQ', 'XIN', 'SHD', 'HEN', 'GUD', 'GUI', 'BEJ', 'MAC', 'TAJ', 'HLJ', 'HEB', 'ZHJ', 'ANH', 'GXI', 'HAI', 'JIL', 'SHX', 'HUN', 'YUN', 'FUJ', 'HUB', 'SHA', 'HKG', 'QIH', 'GAN', 'JSU', 'SCH', 'NXA', 'TAI']
-        .forEach(function (d) {
-            var low = Math.round(100 * Math.random()),
-                mid = Math.round(100 * Math.random()),
-                high = Math.round(100 * Math.random());
+        .forEach(function (d,i) {
+//            alert(nums[i]);
+            var low = nums[i],
+                mid = nums[i],
+                high = nums[i];
+            var value = nums[i];
+            if (value>100){
+                value = 100
+            }
             sampleData[d] = {
-                low: d3.min([low, mid, high]), high: d3.max([low, mid, high]),
-                avg: Math.round((low + mid + high) / 3), color: d3.interpolate("#ffffcc", "#800026")(low / 100)
+                avg: Math.round((low + mid + high) / 3), color: d3.interpolate("#ffffcc", "#700000")(value / 100)
             };
         });
 

@@ -128,7 +128,7 @@ a:focus, a:hover {
     padding: 200px 0;
     text-align: center;
     color: #fff;
-    background: url(../img/intro-bg.jpg) no-repeat bottom center scroll;
+    background: url(../img/byzantium-background.jpg) no-repeat bottom center scroll;
     background-color: #000;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -149,6 +149,21 @@ a:focus, a:hover {
     font-size: 18px
 }
 
+@media (min-width: 768px) {
+    .masthead {
+        height: 100%;
+        padding: 0
+    }
+
+    .masthead .intro-body .brand-heading {
+        font-size: 100px
+    }
+
+    .masthead .intro-body .intro-text {
+        font-size: 22px
+    }
+}
+
 .totalhead {
     display: table;
     width: 100%;
@@ -156,7 +171,7 @@ a:focus, a:hover {
     padding: 200px 0;
     text-align: center;
     color: white;
-    background: url("../img/platform.jpg") no-repeat bottom center scroll;
+    background: url("../img/intro-bg.jpg") no-repeat bottom center scroll;
     background-color: black;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -178,16 +193,16 @@ a:focus, a:hover {
 }
 
 @media (min-width: 768px) {
-    .masthead {
+    .totalhead {
         height: 100%;
         padding: 0
     }
 
-    .masthead .intro-body .brand-heading {
+    .totalhead .intro-body .brand-heading {
         font-size: 100px
     }
 
-    .masthead .intro-body .intro-text {
+    .totalhead .intro-body .intro-text {
         font-size: 22px
     }
 }
@@ -220,7 +235,7 @@ a:focus, a:hover {
 
 .download-section {
     color: #fff;
-    background: url(../img/downloads-bg.jpg) no-repeat center center scroll;
+    background: url(../img/byzantium-background.jpg) no-repeat center center scroll;
     background-color: #000;
     -webkit-background-size: cover;
     -moz-background-size: cover;

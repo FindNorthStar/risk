@@ -201,10 +201,10 @@
                     <a class="nav-link js-scroll-trigger" href="#total">整体分析</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="#judicial">司法</a>
+                    <a class="nav-link js-scroll-trigger" href="#commerce">工商</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="#commerce">工商</a>
+                    <a class="nav-link js-scroll-trigger" href="#judicial">司法</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link js-scroll-trigger" href="#business">经营</a>
@@ -232,9 +232,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
-                    <a href="#total" class="btn btn-circle js-scroll-trigger" style="margin-top:210px;color:black">
-                        <i class="fa fa-angle-double-down animated"></i>
-                    </a>
+                    <h1 style="color: white ; font-size: 4em">{{ platform_name }}风险分析</h1>
+                    <!--<a href="#total" class="btn btn-circle js-scroll-trigger" style="margin-top:210px;color:black">-->
+                        <!--<i class="fa fa-angle-double-down animated"></i>-->
+                    <!--</a>-->
                 </div>
             </div>
         </div>
@@ -252,144 +253,152 @@
     </div>
     <!--<img src="{{ STATIC_URL }}/static/img/platform_0.JPG" alt="整体分析"/>-->
     <div class="row">
-        <svg id="fillgauge1" width="20%" height="200"></svg>
-        <div id="sorceSort"></div>
-        <label><input type="checkbox">排序</label>
-        <div id="totalText" style="float:right; width: 42%; padding-top: 10px">
-            <h4 style="text-align: right">企业法定代表人：{{ company_info.legal_person }}</h4>
-            <h4 style="text-align: right">注册资本：{{ company_info.register_capital }}万元人民币</h4>
-            <h4 style="text-align: right">经营状态：{{ company_info.business_state }}</h4>
+        <div style="width:40%">
+            <!--<h3 style="text-align: left;">整体风险值：</h3>-->
+        <svg id="fillgauge1" width="45%" height="200" style="float: left"></svg>
+        <!--<div id="sorceSort"></div>-->
+        <!--<label><input type="checkbox">排序</label>-->
+        <div id="totalText" style="padding-top: 10px;width: 55%; float:right">
+            <h3 style="text-align: left;padding-bottom: 10px">{{ platform_name }}：{{ total_risk_score }} 分</h3>
+            <h6 style="text-align: left;margin-bottom: 10px">公司名称：{{ company_info.company_name }}</h6>
+            <h6 style="text-align: left;margin-bottom: 10px">注册资本：{{ company_info.register_capital }}万元人民币</h6>
+            <h6 style="text-align: left;margin-bottom: 10px">经营状态：{{ company_info.business_state }}</h6>
+            <h6 style="text-align: left;margin-bottom: 10px">主营业务：{{ company_info.business_scope }}</h6>
         </div>
         <script>
-
-            var margin = {top: 0, right: 0, bottom: 20, left: 40},
-                width = 500 - margin.left - margin.right,
-                height = 200 - margin.top - margin.bottom;
-
-            var sort_x = d3.scale.ordinal()
-                .rangeRoundBands([0, width], .1, 1);
-
-            var sort_y = d3.scale.linear()
-                .range([height, 0]);
-
-            var xAxis = d3.svg.axis()
-                .scale(sort_x)
-                .orient("bottom");
-
-            var yAxis = d3.svg.axis()
-                .scale(sort_y)
-                .orient("left");
-
-            var svg_sort = d3.select("#sorceSort").append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", 200)
-                .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            d3.tsv("{{ STATIC_URL }}/static/data.tsv", function (error, data) {
-
-                data.forEach(function (d) {
-                    d.frequency = +d.frequency;
-                });
-
-                sort_x.domain(data.map(function (d) {
-                    return d.letter;
-                }));
-                sort_y.domain([0, d3.max(data, function (d) {
-                    return d.frequency;
-                })]);
-
-                svg_sort.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + 180 + ")")
-                    .call(xAxis);
-
-                svg_sort.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis)
-                    .append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                    .text("风险值");
-
-                svg_sort.selectAll(".bar")
-                    .data(data)
-                    .enter().append("rect")
-                    .attr("class", "bar")
-                    .attr("x", function (d) {
-                        return sort_x(d.letter);
-                    })
-                    .attr("width", sort_x.rangeBand() * 2 / 3)
-                    .attr("y", function (d) {
-                        return sort_y(d.frequency);
-                    })
-                    .attr("height", function (d) {
-                        return 180 - sort_y(d.frequency);
-                    });
-
-                d3.select("input").on("change", change_sort);
-
-                var sortTimeout = setTimeout(function () {
-                    d3.select("input").property("checked", true).each(change_sort);
-                }, 2000);
-
-                function change_sort() {
-                    clearTimeout(sortTimeout);
-                    // Copy-on-write since tweens are evaluated after a delay.
-                    var x_sort = sort_x.domain(data.sort(this.checked
-                        ? function (a, b) {
-                            return b.frequency - a.frequency;
-                        }
-                        : function (a, b) {
-                            return d3.ascending(a.letter, b.letter);
-                        })
-                        .map(function (d) {
-                            return d.letter;
-                        }))
-                        .copy();
-
-                    svg_sort.selectAll(".bar")
-                        .sort(function (a, b) {
-                            return x_sort(a.letter) - x_sort(b.letter);
-                        });
-
-                    var transition = svg_sort.transition().duration(750),
-                        delay = function (d, i) {
-                            return i * 50;
-                        };
-
-                    transition.selectAll(".bar")
-                        .delay(delay)
-                        .attr("x", function (d) {
-                            return x_sort(d.letter);
-                        });
-
-                    transition.select(".x.axis")
-                        .call(xAxis)
-                        .selectAll("g")
-                        .delay(delay);
-                }
-            });
+//            var margin = {top: 0, right: 0, bottom: 20, left: 40},
+//                width = 500 - margin.left - margin.right,
+//                height = 200 - margin.top - margin.bottom;
+//
+//            var sort_x = d3.scale.ordinal()
+//                .rangeRoundBands([0, width], .1, 1);
+//
+//            var sort_y = d3.scale.linear()
+//                .range([height, 0]);
+//
+//            var xAxis = d3.svg.axis()
+//                .scale(sort_x)
+//                .orient("bottom");
+//
+//            var yAxis = d3.svg.axis()
+//                .scale(sort_y)
+//                .orient("left");
+//
+//            var svg_sort = d3.select("#sorceSort").append("svg")
+//                .attr("width", width + margin.left + margin.right)
+//                .attr("height", 200)
+//                .append("g")
+//                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//
+//            d3.tsv("{{ STATIC_URL }}/static/data.tsv", function (error, data) {
+//
+//                data.forEach(function (d) {
+//                    d.frequency = +d.frequency;
+//                });
+//
+//                sort_x.domain(data.map(function (d) {
+//                    return d.letter;
+//                }));
+//                sort_y.domain([0, d3.max(data, function (d) {
+//                    return d.frequency;
+//                })]);
+//
+//                svg_sort.append("g")
+//                    .attr("class", "x axis")
+//                    .attr("transform", "translate(0," + 180 + ")")
+//                    .call(xAxis);
+//
+//                svg_sort.append("g")
+//                    .attr("class", "y axis")
+//                    .call(yAxis)
+//                    .append("text")
+//                    .attr("transform", "rotate(-90)")
+//                    .attr("y", 6)
+//                    .attr("dy", ".71em")
+//                    .style("text-anchor", "end")
+//                    .text("风险值");
+//
+//                svg_sort.selectAll(".bar")
+//                    .data(data)
+//                    .enter().append("rect")
+//                    .attr("class", "bar")
+//                    .attr("x", function (d) {
+//                        return sort_x(d.letter);
+//                    })
+//                    .attr("width", sort_x.rangeBand() * 2 / 3)
+//                    .attr("y", function (d) {
+//                        return sort_y(d.frequency);
+//                    })
+//                    .attr("height", function (d) {
+//                        return 180 - sort_y(d.frequency);
+//                    });
+//
+//                d3.select("input").on("change", change_sort);
+//
+//                var sortTimeout = setTimeout(function () {
+//                    d3.select("input").property("checked", true).each(change_sort);
+//                }, 2000);
+//
+//                function change_sort() {
+//                    clearTimeout(sortTimeout);
+//                    // Copy-on-write since tweens are evaluated after a delay.
+//                    var x_sort = sort_x.domain(data.sort(this.checked
+//                        ? function (a, b) {
+//                            return b.frequency - a.frequency;
+//                        }
+//                        : function (a, b) {
+//                            return d3.ascending(a.letter, b.letter);
+//                        })
+//                        .map(function (d) {
+//                            return d.letter;
+//                        }))
+//                        .copy();
+//
+//                    svg_sort.selectAll(".bar")
+//                        .sort(function (a, b) {
+//                            return x_sort(a.letter) - x_sort(b.letter);
+//                        });
+//
+//                    var transition = svg_sort.transition().duration(750),
+//                        delay = function (d, i) {
+//                            return i * 50;
+//                        };
+//
+//                    transition.selectAll(".bar")
+//                        .delay(delay)
+//                        .attr("x", function (d) {
+//                            return x_sort(d.letter);
+//                        });
+//
+//                    transition.select(".x.axis")
+//                        .call(xAxis)
+//                        .selectAll("g")
+//                        .delay(delay);
+//                }
+//            });
 
         </script>
-    </div>
-
-    <div id="sequences">
-        <div id="main">
-            <div id="sequence"></div>
-            <div id="chart">
-                <div id="explanation" style="visibility: hidden;">
-                    <span id="percentage"></span><br/>
-                    influence of the overall risk
-                </div>
-                <div id="explanationPicture">
-                    <div class="radarChart"></div>
+        </div>
+        <div style="width:60%">
+        <div id="sequences">
+            <div id="main">
+             <div id="sequence"></div>
+                <div id="chart">
+                    <div id="explanation" style="visibility: hidden;">
+                        <span id="percentage"></span><br/>
+                        influence of the overall risk
+                    </div>
+                    <div id="explanationPicture">
+                        <div class="radarChart"></div>
+                    </div>
                 </div>
             </div>
         </div>
+        </div>
+
     </div>
+
+
     <script type="text/javascript" src="{{ STATIC_URL }}/static/vendor/sequences/sequences.js"></script>
     <script type="text/javascript">
         // Hack to make this example display correctly in an iframe on bl.ocks.org
@@ -402,7 +411,7 @@
         /* Radar chart design created by Nadieh Bremer - VisualCinnamon.com */
 
         var margin = {top: 100, right: 100, bottom: 100, left: 100},
-            width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
+            width = Math.min(570, window.innerWidth - 10) - margin.left - margin.right,
             height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
         var data = [
@@ -413,7 +422,7 @@
                 {axis: "招聘", value: {{ employ_risk_score }} },
                 {axis: "税务", value: {{ tax_risk_score }} },
                 {axis: "违规", value: {{ outline_risk_score }} },
-                {axis: "司法", value: {{ law_risk_score }} },
+                {axis: "司法", value: {{ law_risk_score }} }
             ]
         ];
 
@@ -432,269 +441,13 @@
         //Call function to draw the Radar chart
         RadarChart(".radarChart", data, radarChartOptions);
     </script>
-    <a href="#judicial" class="btn btn-circle js-scroll-trigger" style="margin-top:120px; color:gray">
-        <i class="fa fa-angle-double-down animated"></i>
-    </a>
+    <!--<a href="#judicial" class="btn btn-circle js-scroll-trigger" style="margin-top:120px; color:gray">-->
+        <!--<i class="fa fa-angle-double-down animated"></i>-->
+    <!--</a>-->
 
 </section>
 
-<section id="judicial" class="content-section text-center" style="padding-top:50px">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <h1>司法信息风险分析</h1>
-            </div>
-        </div>
-    </div>
-    <div>
-        <h2 style="text-align:left;padding-left: 100px">司法信息</h2>
-        <div style="float:left;padding-left: 100px">
-            {% for law_type in law_type_info %}
-            <button type="button" class="btn btn-danger">{{ law_type.case_brief }} <span class="badge">{{ law_type.case_count }}</span>
-            </button>
-            {% endfor %}
-        </div>
-        <svg id="fillgauge2" style="float:right" width="20%" height="200"></svg>
-    </div>
-    <div id="platform_relation"></div>
-    <script>
-
-        $.ajax({method:'get',url:'/businessrelation.json'}).done(function (data){
-            linksData = data.link_data;
-
-            var links = linksData;
-
-            var nodes = {};
-
-        // Compute the distinct nodes from the links.
-        links.forEach(function (link) {
-            link.source = nodes[link.source] || (nodes[link.source] = {
-                name: link.source,
-                color: link.color,
-                value: link.value
-            });
-            link.target = nodes[link.target] || (nodes[link.target] = {
-                name: link.target,
-                color: link.color,
-                value: link.value
-            });
-        });
-
-        var width = 1080,
-            height = 800;
-
-        var force = d3.layout.force()
-            .nodes(d3.values(nodes))
-            .links(links)
-            .size([width, height])
-            .linkDistance(10)
-            .charge(-1300)
-            .on("tick", tick)
-            .start();
-
-        var svg_relation = d3.select("#platform_relation").append("svg")
-            .attr("width", width)
-            .attr("height", height);
-
-        // Per-type markers, as they don't inherit styles.
-        svg_relation.append("defs").selectAll("marker")
-            .data(["suit", "licensing", "resolved"])
-            .enter().append("marker")
-            .attr("id", function (d) {
-                return d;
-            })
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 15)
-            .attr("refY", -1.5)
-            .attr("markerWidth", 16)
-            .attr("markerHeight", 16)
-            .attr("orient", "auto")
-            .append("path")
-            .attr("d", "M0,-5L10,0L0,5");
-
-        var path = svg_relation.append("g").selectAll("path")
-            .data(force.links())
-            .enter().append("path")
-            .attr("class", function (d) {
-                return "link " + d.type;
-            })
-            .attr("marker-end", function (d) {
-                return "url(#" + d.type + ")";
-            })
-            .style("stroke", function (d) {
-                if (d.color == "c6dbef") return ("#3182bd");
-                else return ("#fd8d3c");
-            })
-            .style("fill", "none")
-            .style("stroke-width", "1.5px");
-
-        var circle = svg_relation.append("g").selectAll("circle")
-            .data(force.nodes())
-            .enter().append("circle")
-            .attr("r", function (d) {
-                return (d.value);
-            })
-            .style("fill", function (d) {
-                return (d.color);
-            })
-            .style("stroke", function (d) {
-                if (d.color == "c6dbef") return ("#3182bd");
-                else return ("#fd8d3c");
-            })
-            .call(force.drag);
-
-        var text = svg_relation.append("g").selectAll("text")
-            .data(force.nodes())
-            .enter().append("text")
-            .style("font-size", function (d) {
-                return Math.max((d.value / 2), 10) + "px";
-            })
-            .style("fill", function (d) {
-                if (d.color == "c6dbef") return ("#3382bd");
-                else return ("#ff8d3c");
-            })
-            .attr("x", function (d) {
-                return 0 - (d.name).length * (d.value / 4);
-            })
-            .attr("y", ".31em")
-            .text(function (d) {
-                return d.name;
-            });
-
-        // Use elliptical arc path segments to doubly-encode directionality.
-        function tick() {
-            path.attr("d", linkArc);
-            circle.attr("transform", transform);
-            text.attr("transform", transform);
-        }
-
-        function linkArc(d) {
-            var dx = d.target.x - d.source.x,
-                dy = d.target.y - d.source.y,
-                dr = Math.sqrt(dx * dx + dy * dy);
-            return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
-        }
-
-        function transform(d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        }
-
-    }).fail();
-
-
-    </script>
-
-    <div class="judicialDetail" style="padding-top: 50px">
-        <div id="judicialLeft" style="float:left; width:55%">
-            <div id="tooltip"></div><!-- div to hold tooltip. -->
-            <svg width="100%" height="620" id="statesvg" style="float:left;padding-top: 100px"></svg>
-
-        <div class="col-lg-12" style="float:left">
-            <div class="panel panel-default">
-                <div class="panel-heading" style="font-size:20px">
-                    关键案件
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>企业名称</th>
-                                <th>发布时间</th>
-                                <th>案件性质</th>
-                                <th>案由</th>
-                                <th>判决结果</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for list_law_item in list_law_info %}
-                            {% if forloop.counter|divisibleby:2 %}
-                            <tr class="success">
-                                {% else %}
-                            <tr class="warning">
-                                {% endif %}
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ list_law_item.platform_name }}</td>
-                                <td>{{ list_law_item.end_date }}</td>
-                                <td>{{ list_law_item.document_type }}</td>
-                                <td>{{ list_law_item.case_brief }}</td>
-                                {% if list_law_item.judge_result2|length|get_digit:"-1" > 40 %}
-                                <td>{{ list_law_item.judge_result2|slice:"40" }}...</td>
-                                {% else %}
-                                <td>{{ list_law_item.judge_result2 }}</td>
-                                {% endif %}
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- /.table-responsive -->
-                </div>
-                <!-- /.panel-body -->
-            </div>
-            <!-- /.panel -->
-        </div>
-
-        </div>
-        <div id="judicialRight" style="float:right; width:45%">
-            <div class="Timelineheader">司法案件 Timeline
-                <div id="dataYear"></div>
-            </div>
-            <div class="wrap">
-                <div class="timeline2">
-                    {% for item in case_info %}
-                    <div class="year"><h2 class="hyear" align="left">{{ item.0 }}</h2>
-                        {% for case_item in item.1 %}
-                        <div class="evt">
-                            <div class="in">
-                                 <span class="timeLinedate">
-                                    <span class="day">{{ case_item.day }}</span>
-                                    <span class="month">{{ case_item.month }}</span>
-                                 </span>
-                                <h2>{{ case_item.brief }}</h2>
-                                <p class="data">{{ case_item.title }}</p>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    {% endfor %}
-
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>$(function () {
-            $(window).scroll(function () {
-                $('.year').each(function () {
-                    var year = $(this).find('h2').first().text();
-                    if ($(this).offset().top < $(document).scrollTop() + 100) {
-                        $(this).find('.timeLinedate').addClass('activeYear');
-                        $('#dataYear').html(year);
-                    } else {
-                        $(this).find('.timeLinedate').removeClass('activeYear');
-                    }
-                });
-            });
-        });
-        $(document).ready(function () {
-            var year = $('.year').find('h2').first().text();
-            $('#dataYear').html(year);
-            $('.year').first().find('.timeLinedate').addClass('activeYear');
-        });
-        var righteight = document.getElementById('judicialRight').scrollHeight;
-        var lefteight = document.getElementById('judicialLeft').scrollHeight;
-        var judicialDetail = d3.select(".judicialDetail")
-        .style("height", function (d) {
-                    return Math.max(righteight,lefteight)+"px";
-                });
-        </script>
-</section>
-
-<section id="commerce" class="content-section text-center" style="padding-top:50px">
+<section id="commerce" class="content-section text-center" style="padding-top:50px;padding-bottom:5px">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -702,11 +455,8 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <svg id="fillgauge3" width="20%" height="200"></svg>
-    </div>
-    <div class="row">
-        <div class="col-lg-8" style="float:left; text-align: left; margin-left: auto;margin-right: auto; ">
+    <div class="row" style="padding-bottom: 20px">
+        <div class="col-lg-10" style="float:left; text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-info">
                 <div class="panel-heading">
                     企业照面信息
@@ -867,8 +617,97 @@
         </div>
     </div>
 
+    <h2 style="text-align: left;padding-left: 20px">工商维度风险</h2>
     <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+        <svg id="fillgauge3" width="20%" height="200"></svg>
+        <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                        <center>
+                                <h8 class="panel-title" style="color:white">注销信息</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                        <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">0</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">破产信息</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">0</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">行政处罚</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ admin_penalty_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">股权冻结</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ freeze_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">清算信息</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ liquidation_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">信息变更</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ change_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+    </div>
+
+    <div class="row"  style="padding-top: 10px">
+        <div class="col-lg-11" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     企业工商信息变更
@@ -921,7 +760,358 @@
 
 </section>
 
-<section id="business" class="content-section text-center" style="padding-top:50px">
+<section id="judicial" class="content-section text-center" style="padding-top:50px;padding-bottom: 10px">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1>司法信息风险分析</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!--<h2 style="text-align:left;padding-left: 100px">司法信息</h2>-->
+        <!--<div style="float:left;padding-left: 100px">-->
+            <!--{% for law_type in law_type_info %}-->
+            <!--<button type="button" class="btn btn-danger">{{ law_type.case_brief }} <span class="badge">{{ law_type.case_count }}</span>-->
+            <!--</button>-->
+            <!--{% endfor %}-->
+        <!--</div>-->
+        <svg id="fillgauge2" width="20%" height="200"></svg>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">破产信息</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">0</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">司法拍卖</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">0</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">司法曝光</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">0</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">失信公告</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ fail_credit_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">执行公告</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ document_execute_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">裁判文书</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ document_judgement_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+    </div>
+    <div class="row" style="padding-top: 20px">
+    <div style="width: 20%;">
+        <h2 style="text-align:left;padding-left: 100px">案由分类</h2>
+        <div style="float:left;padding-left: 100px">
+            {% for law_type in law_type_info %}
+            <button type="button" class="btn btn-danger" style="min-width:200px">{{ law_type.case_brief }} <span class="badge">{{ law_type.case_count }}</span>
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="platform_relation" style="width: 80%;height:800px"></div>
+        </div>
+    <script>
+
+        $.ajax({method:'get',url:'/businessrelation.json'}).done(function (data){
+            linksData = data.link_data;
+
+            var links = linksData;
+
+            var nodes = {};
+
+        // Compute the distinct nodes from the links.
+        links.forEach(function (link) {
+            link.source = nodes[link.source] || (nodes[link.source] = {
+                name: link.source,
+                color: link.color,
+                value: link.value
+            });
+            link.target = nodes[link.target] || (nodes[link.target] = {
+                name: link.target,
+                color: link.color,
+                value: link.value
+            });
+        });
+
+        var width = 1100,
+            height = 800;
+
+        var force = d3.layout.force()
+            .nodes(d3.values(nodes))
+            .links(links)
+            .size([width, height])
+            .linkDistance(10)
+            .charge(-1300)
+            .on("tick", tick)
+            .start();
+
+        var svg_relation = d3.select("#platform_relation").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Per-type markers, as they don't inherit styles.
+        svg_relation.append("defs").selectAll("marker")
+            .data(["suit", "licensing", "resolved"])
+            .enter().append("marker")
+            .attr("id", function (d) {
+                return d;
+            })
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 15)
+            .attr("refY", -1.5)
+            .attr("markerWidth", 16)
+            .attr("markerHeight", 16)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5");
+
+        var path = svg_relation.append("g").selectAll("path")
+            .data(force.links())
+            .enter().append("path")
+            .attr("class", function (d) {
+                return "link " + d.type;
+            })
+            .attr("marker-end", function (d) {
+                return "url(#" + d.type + ")";
+            })
+            .style("stroke", function (d) {
+                if (d.color == "c6dbef") return ("#3182bd");
+                else return ("#fd8d3c");
+            })
+            .style("fill", "none")
+            .style("stroke-width", "1.5px");
+
+        var circle = svg_relation.append("g").selectAll("circle")
+            .data(force.nodes())
+            .enter().append("circle")
+            .attr("r", function (d) {
+                return (d.value);
+            })
+            .style("fill", function (d) {
+                return (d.color);
+            })
+            .style("stroke", function (d) {
+                if (d.color == "c6dbef") return ("#3182bd");
+                else return ("#fd8d3c");
+            })
+            .call(force.drag);
+
+        var text = svg_relation.append("g").selectAll("text")
+            .data(force.nodes())
+            .enter().append("text")
+            .style("font-size", function (d) {
+                return Math.max((d.value / 2), 10) + "px";
+            })
+            .style("fill", function (d) {
+                if (d.color == "c6dbef") return ("#3382bd");
+                else return ("#ff8d3c");
+            })
+            .attr("x", function (d) {
+                return 0 - (d.name).length * (d.value / 4);
+            })
+            .attr("y", ".31em")
+            .text(function (d) {
+                return d.name;
+            });
+
+        // Use elliptical arc path segments to doubly-encode directionality.
+        function tick() {
+            path.attr("d", linkArc);
+            circle.attr("transform", transform);
+            text.attr("transform", transform);
+        }
+
+        function linkArc(d) {
+            var dx = d.target.x - d.source.x,
+                dy = d.target.y - d.source.y,
+                dr = Math.sqrt(dx * dx + dy * dy);
+            return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+        }
+
+        function transform(d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        }
+
+    }).fail();
+
+
+    </script>
+
+    <div class="judicialDetail" style="padding-top: 50px">
+        <div id="judicialLeft" style="float:left; width:55%">
+        <div class="col-lg-12" style="float:left">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:35px; text-align: left">
+                    关键案件介绍
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>企业名称</th>
+                                <th>发布时间</th>
+                                <th>案件性质</th>
+                                <th>案由</th>
+                                <th>判决结果</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for list_law_item in list_law_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ list_law_item.platform_name }}</td>
+                                <td>{{ list_law_item.end_date }}</td>
+                                <td>{{ list_law_item.document_type }}</td>
+                                <td>{{ list_law_item.case_brief }}</td>
+                                {% if list_law_item.judge_result2|length|get_digit:"-1" > 40 %}
+                                <td>{{ list_law_item.judge_result2|slice:"40" }}...</td>
+                                {% else %}
+                                <td>{{ list_law_item.judge_result2 }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+            <h2 style="text-align: left;margin-bottom: 0px; padding-left: 10px">案件地区热点图</h2>
+            <div id="tooltip"></div><!-- div to hold tooltip. -->
+            <svg width="100%" height="620" id="statesvg" style="float:left;padding-top: 0px"></svg>
+        </div>
+        <div id="judicialRight" style="float:right; width:45%">
+            <div class="Timelineheader" style="text-align: left;color: black">司法案件 Timeline
+                <!--<div id="dataYear"></div>-->
+            </div>
+            <div class="wrap">
+                <div class="timeline2">
+                    {% for item in case_info %}
+                    <div class="year"><h2 class="hyear" align="left">{{ item.0 }}</h2>
+                        {% for case_item in item.1 %}
+                        <div class="evt">
+                            <div class="in">
+                                 <span class="timeLinedate">
+                                    <span class="day">{{ case_item.day }}</span>
+                                    <span class="month">{{ case_item.month }}</span>
+                                 </span>
+                                <h2>{{ case_item.brief }}</h2>
+                                <p class="data">{{ case_item.title }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% endfor %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>$(function () {
+            $(window).scroll(function () {
+                $('.year').each(function () {
+                    var year = $(this).find('h2').first().text();
+                    if ($(this).offset().top < $(document).scrollTop() + 100) {
+                        $(this).find('.timeLinedate').addClass('activeYear');
+                        $('#dataYear').html(year);
+                    } else {
+                        $(this).find('.timeLinedate').removeClass('activeYear');
+                    }
+                });
+            });
+        });
+        $(document).ready(function () {
+            var year = $('.year').find('h2').first().text();
+            $('#dataYear').html(year);
+            $('.year').first().find('.timeLinedate').addClass('activeYear');
+        });
+        var righteight = document.getElementById('judicialRight').scrollHeight;
+        var lefteight = document.getElementById('judicialLeft').scrollHeight;
+        var judicialDetail = d3.select(".judicialDetail")
+        .style("height", function (d) {
+                    return Math.max(righteight,lefteight)+"px";
+                });
+        </script>
+</section>
+
+
+<section id="business" class="content-section text-center" style="margin-top:50px;padding-top:0px;padding-bottom:5px;background: white">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -933,11 +1123,11 @@
         <svg id="fillgauge4" width="20%" height="200"></svg>
     </div>
 
-     <div class="row">
+     <div class="row" style="padding-top: 10px">
         <div class="col-lg-12" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
-                    税务非正常户
+                    平台经营数据
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -948,15 +1138,14 @@
                                 <th>#</th>
                                 <th>平台名称</th>
                                 <th>成交量（万元）</th>
-                                <th>平均参考收益率（%）</th>
+                                <th>平均利率（%）</th>
+                                <th>投资人数</th>
                                 <th>平均借款期限（月）</th>
-                                <th>净资金流入（万元）</th>
-                                <th>待还余款（万元）</th>
-                                <th>满标用时（分）</th>
-                                <th>注册资本（万元）</th>
-                                <th>运营时间（月）</th>
-                                <th>开始日期</th>
-                                <th>截止日期</th>
+                                <th>借款人数</th>
+                                <th>累计待还金额（万元）</th>
+                                <th>30日资金净流入（万元）</th>
+                                <th>未来60日待还（万元）</th>
+                                <th>交易日期</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -967,17 +1156,16 @@
                             <tr class="warning">
                                 {% endif %}
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ wdzj_item.platform_name }}</td>
-                                <td>{{ wdzj_item.amount }}</td>
-                                <td>{{ wdzj_item.incomerate }}</td>
-                                <td>{{ wdzj_item.loanperiod }}</td>
-                                <td>{{ wdzj_item.netinflowofthirty }}</td>
-                                <td>{{ wdzj_item.staystilloftotal }}</td>
-                                <td>{{ wdzj_item.fullloantime }}</td>
-                                <td>{{ wdzj_item.regcapital }}</td>
-                                <td>{{ wdzj_item.timeoperation }}</td>
-                                <td>{{ wdzj_item.startdate }}</td>
-                                <td>{{ wdzj_item.enddate }}</td>
+                                <td>{{ wdzj_item.fullname }}</td>
+                                <td>{{ wdzj_item.tradingvolume }}</td>
+                                <td>{{ wdzj_item.avereturn }}</td>
+                                <td>{{ wdzj_item.investornum }}</td>
+                                <td>{{ wdzj_item.avelimtime }}</td>
+                                <td>{{ wdzj_item.loannum }}</td>
+                                <td>{{ wdzj_item.cumulaterepay }}</td>
+                                <td>{{ wdzj_item.f30repay }}</td>
+                                <td>{{ wdzj_item.f60repay }}</td>
+                                <td>{{ wdzj_item.tradingdate }}</td>
                             </tr>
                             {% endfor %}
                             </tbody>
@@ -995,7 +1183,7 @@
         <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Multiple Axes Line Chart Example
+                    企业成交量走势图
                 </div>
                 <div class="panel-body">
                     <div class="flot-chart">
@@ -1007,7 +1195,7 @@
         <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Moving Line Chart Example
+                    企业平均利率流动图
                 </div>
                 <div class="panel-body">
                     <div class="flot-chart">
@@ -1024,7 +1212,7 @@
 
 </section>
 
-<section id="tax" class="content-section text-center" style="padding-top:50px">
+<section id="tax" class="content-section text-center" style="padding-top:50px;padding-bottom:5px">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -1034,10 +1222,66 @@
     </div>
     <div class="row">
         <svg id="fillgauge5" width="20%" height="200"></svg>
+        <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                        <center>
+                                <h8 class="panel-title" style="color:white">欠税公告</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                        <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ tax_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">非正常户</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ abnormal_tax_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">信用等级</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ tax_credit_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">涉税处罚</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ tax_penalty_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+    <div class="row" style="padding-top: 20px">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     纳税信用等级
@@ -1085,7 +1329,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     欠税公告
@@ -1135,7 +1379,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     涉税处罚公示
@@ -1187,7 +1431,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     税务非正常户
@@ -1240,7 +1484,7 @@
 
 </section>
 
-<section id="sentiment" class="content-section text-center" style="padding-top:50px">
+<section id="sentiment" class="content-section text-center" style="margin-top:50px;padding-top:0px;padding-bottom:5px;background: white">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -1250,26 +1494,144 @@
     </div>
 
     <div class="row">
-        <svg id="fillgauge6" width="20%" height="200"></svg>
-        <div class="bubbleChart" style="float:right;padding-left: 10%"></div>
-    </div>
+        <div style="width: 40%">
+            <svg id="fillgauge6" width="30%" height="200" style="float: left;margin: 20px"></svg>
+            <div class="sentimentCount"></div>
+            <h6 style="margin-top: 30px;margin-bottom: 0px;text-align: left">关键词词频统计</h6>
+            <div class="bubbleChart" style="width: 80%"></div>
+        </div>
+    <script>
 
-    <div id="wordCloud">
-    </div>
+
+    </script>
+
+        <div id="wordCloud" style="width:60%">
+        </div>
+         </div>
+
+
+
+
 
     <script src="{{ STATIC_URL }}/static/wordcloud/d3.layout.cloud.js"></script>
 
     <script>
 
-
         $.ajax({method: 'get', url: '/newswords.json'}).done(function (data) {
+
+
+            var h = 100
+        var w = 250
+        var xspa = 30
+
+        var svg = d3.select('.sentimentCount')
+        .append('svg')
+        .attr('width', w*1.5)
+        .attr('height', h*2);
+        // look at chp 7 of vizualizing data
+        var circs = data.comments;
+
+        var titles= [0,1,2]
+
+        /* Define the data for the circles */
+        var elem = svg.selectAll("g myCircleText")
+            .data(circs)
+
+        /*Create and place the "blocks" containing the circle and the text */
+        var elemEnter = elem.enter()
+	        .append("g")
+	        .attr("transform", function(d,i){
+                return "translate("+(50 + 100 * i)+","+h*1.3+")";
+            })
+
+    /*Create the circle for each block */
+    var circle = elemEnter.append("circle")
+	    .attr("r", function(d){
+            if (d === Math.min.apply(null, circs)){
+                return 20;
+            }
+            else if (d === Math.max.apply(null, circs)){
+                return 45;
+            }
+            else{
+                return 30;
+            }
+        })
+	    .attr("stroke","black")
+	    .attr('fill',function(d,i){
+            if (i==0){
+                return 'red';
+            }
+            else if (i==1){
+                return 'grey';
+            }
+            else{
+                return 'lightblue';
+            }
+            })
+
+
+    /* Create the text for each block */
+    elemEnter.append("text")
+        .attr('font-size', 15)
+        .text(function(d){return d})
+        .attr({
+      "alignment-baseline": "middle",
+      "text-anchor": "middle"
+    })
+
+    elemEnter.append("text")
+        // .attr("dx", function(d){return d})
+        .attr("dy", function(d){
+            return -80;
+        })
+        .attr('font-size', 15)
+        .text(function(d,i){
+            if (i==0){
+                    return '负面舆情';
+                }
+                else if (i==1){
+                    return '中性舆情';
+                }
+                else{
+                    return '正面舆情';
+                }
+        })
+        .attr({
+      "alignment-baseline": "middle",
+      "text-anchor": "middle"
+    });
+
+        svg.selectAll('text')
+            .data(titles).enter().append('text')
+            .text(function (d, i) {
+                console.log(i);
+                if (i==0){
+                    return '负面舆情';
+                }
+                else if (i==1){
+                    return '中性舆情';
+                }
+                else{
+                    return '正面舆情';
+                }
+            })
+            .attr('font-size', 15)
+            .attr('fill', 'black')
+            .attr('x', function (d, i) {
+                return 50 + 100 * i
+            })
+            .attr('y', h * 0.4)
+            .attr('text-anchor', 'middle')
+
+    {#----------------------------word cloud-------------------------------#}
 
             var fill = d3.scale.category20();
 
         wordsList = data.words;
 
         var layout = d3.layout.cloud()
-            .size([1080, 600])
+            .size([800, 800])
             .words(wordsList.map(function (d) {
                 return {text: d[0], size: 20 + d[1]};
             }))
@@ -1279,7 +1641,7 @@
             })
             .font("Impact")
             .fontSize(function (d) {
-                return d.size;
+                return d.size/2;
             })
             .on("end", draw);
 
@@ -1315,7 +1677,7 @@
     </script>
 
     <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     新闻舆论
@@ -1373,8 +1735,7 @@
     <!--</a>-->
 </section>
 
-<!-- Download Section -->
-<section id="out_line" class="download-section1 content-section text-center" style="padding-top:50px">
+<section id="out_line" class="download-section1 content-section text-center" style="padding-top:50px;padding-bottom:5px">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -1384,10 +1745,52 @@
     </div>
     <div class="row">
         <svg id="fillgauge7" width="20%" height="200"></svg>
+        <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                        <center>
+                                <h8 class="panel-title" style="color:white">ICP</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                        <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ icp_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">银行存管</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">{{ bank_depository_info_count }}</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
+      <div class="col-sm-1">
+            <div class="panel panel-danger">
+                    <div class="panel-heading" style="background-color:#dc3545">
+                      <center>
+                                <h8 class="panel-title" style="color:white">央行处罚</h8>
+                        </center>
+                    </div>
+                    <div class="panel-body">
+                            <center>
+                            <span class="badge" style="color:white;background-color:#dc3545">0</span>
+                        </center>
+                    </div>
+                  </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+    <div class="row" style="padding-top: 20px">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     银行存管信息
@@ -1431,7 +1834,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8" style="text-align: left; margin-left: auto;margin-right: auto; ">
+        <div class="col-lg-10" style="text-align: left; margin-left: auto;margin-right: auto; ">
             <div class="panel panel-default">
                 <div class="panel-heading" style="font-size:20px">
                     ICP信息
@@ -1483,7 +1886,7 @@
 
 </section>
 
-<section id="employee" class="content-section text-center" style="padding-top:50px">
+<section id="employee" class="content-section text-center" style="margin-top:50px;padding-top:0px;padding-bottom:5px;background: white">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -1494,14 +1897,55 @@
 
     <div class="row">
         <svg id="fillgauge8" width="20%" height="200"></svg>
-        <div id="employee_radar"></div>
+
+    </div>
+    <div class="row">
+        <div class="col-lg-6" style="text-align: left; margin-left: auto;margin-right: auto; padding-top: 40px">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="font-size:20px">
+                    近期招聘情况
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>招聘时间</th>
+                                <th>职位描述</th>
+                                <th>薪资</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in employ_info %}
+                            {% if forloop.counter|divisibleby:2 %}
+                            <tr class="success">
+                                {% else %}
+                            <tr class="warning">
+                                {% endif %}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.startdate }}</td>
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.salary }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+    </div>
+        <div class="col-lg-6"><div id="employee_radar"></div></div>
     </div>
 
     <div class="row">
         <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading" style="color:black">
-                    Area Chart Example
+                    招聘人数走势图
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -1515,7 +1959,7 @@
         <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading" style="color:black">
-                    Donut Chart Example
+                    招聘学历分布情况
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -1534,8 +1978,8 @@
         $.ajax({method:'get',url:'/salarylevel.json'}).done(function (data){
             salary = data.salary_data;
 
-            var width = 960,
-            height = 800,
+            var width = 800,
+            height = 550,
             radius = Math.min(width, height) / 1.9,
             spacing = .08;
 
@@ -1555,8 +1999,14 @@
                 return (d.index + spacing) * radius;
             });
         var formatter = d3.format(".2%");
-        var svg = d3.select("#employee_radar").append("svg")
-            .attr("width", width)
+        var svg = d3.select("#employee_radar").append("svg");
+        var text1 = svg.append("text")
+            .attr("x",120)
+            .attr("y",60)
+            .style("font-size", "30px")
+            .text("招聘薪资人数比例图（随时间变化）");
+
+         svg = svg.attr("width", width)
             .attr("height", height)
             .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
@@ -1715,7 +2165,6 @@
 
     }).fail();
 
-
     </script>
 
 </section>
@@ -1724,7 +2173,7 @@
 <!-- Footer -->
 <footer>
     <div class="container text-center">
-        <p>Copyright &copy; 166.111.83.80 2017</p>
+        <p style="color: black">Copyright &copy; 166.111.83.80 2017</p>
     </div>
 </footer>
 
@@ -1816,8 +2265,8 @@
 
 <script>
 
-    var m = [20, 20, 30, 20],
-        w = 1000 - m[1] - m[3],
+    var m = [60, 60, 90, 60],
+        w = 1360 - m[1] - m[3],
         h = 550 - m[0] - m[2];
 
     var x,
@@ -1867,8 +2316,6 @@
 
     d3.csv("{{ STATIC_URL }}/static/data/stocks.csv", function (data) {
 
-        {#console.log(data);#}
-
         var parse = d3.time.format("%b %Y").parse;
 
         // Nest stock values by symbol.
@@ -1901,7 +2348,8 @@
         var g = svg.selectAll("g")
             .data(symbols)
             .enter().append("g")
-            .attr("class", "symbol");
+            .attr("class", "symbol")
+            .style("width","100%");
 
         setTimeout(lines, duration);
     });

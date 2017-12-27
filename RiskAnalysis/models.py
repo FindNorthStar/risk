@@ -221,6 +221,20 @@ class Changeinfo(models.Model):
         db_table = 'changeInfo'
 
 
+class Changesummary(models.Model):
+    platform = models.CharField(max_length=450, blank=True, null=True)
+    company = models.CharField(max_length=450, blank=True, null=True)
+    manager_change = models.IntegerField(blank=True, null=True)
+    stock_change = models.IntegerField(blank=True, null=True)
+    register_change = models.IntegerField(blank=True, null=True)
+    max_register_change = models.IntegerField(blank=True, null=True)
+    other_change = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'changeSummary'
+
+
 class Company(models.Model):
     platform_name = models.CharField(max_length=45, blank=True, null=True)
     legal_person = models.CharField(max_length=90, blank=True, null=True)
@@ -445,7 +459,7 @@ class Freezeinfo(models.Model):
 
 class Guotai(models.Model):
     fullname = models.CharField(db_column='FullName', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    tradingdate = models.CharField(db_column='TradingDate', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    tradingdate = models.DateField(db_column='TradingDate', blank=True, null=True)  # Field name made lowercase.
     tradingvolume = models.FloatField(db_column='TradingVolume', blank=True, null=True)  # Field name made lowercase.
     avereturn = models.FloatField(db_column='AveReturn', blank=True, null=True)  # Field name made lowercase.
     investornum = models.IntegerField(db_column='InvestorNum', blank=True, null=True)  # Field name made lowercase.

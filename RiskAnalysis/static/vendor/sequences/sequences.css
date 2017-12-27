@@ -50,8 +50,8 @@
 
 #explanationPicture {
   position: absolute;
-  top: 30px;
-  left: 25px;
+  top: -3px;
+  left: 90px;
   width: 240px;
   text-align: center;
   color: #666;

@@ -1,7 +1,7 @@
 function RadarChart(id, data, options) {
 	var cfg = {
-	 w: 600,				//Width of the circle
-	 h: 600,				//Height of the circle
+	 w: 400,				//Width of the circle
+	 h: 400,				//Height of the circle
 	 margin: {top: 0, right: 0, bottom: 0, left: 0}, //The margins of the SVG
 	 levels: 3,				//How many levels or inner circles should there be drawn
 	 maxValue: 100, 			//What is the value that the biggest circle will represent
@@ -43,6 +43,8 @@ function RadarChart(id, data, options) {
 	var svg = d3.select(id).append("svg")
 			.attr("width",  cfg.w + cfg.margin.left + cfg.margin.right)
 			.attr("height", cfg.h + cfg.margin.top + cfg.margin.bottom)
+            // .attr("width",  400)
+			// .attr("height", 400)
 			.attr("class", "radar"+id);
 	//Append a g element		
 	var g = svg.append("g")

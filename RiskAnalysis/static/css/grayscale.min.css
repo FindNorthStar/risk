@@ -94,6 +94,7 @@ a:focus, a:hover {
 
 @media (min-width: 992px) {
     #mainNav {
+        visibility: hidden;
         padding-top: 20px;
         padding-bottom: 20px;
         -webkit-transition: background .3s ease-in-out, padding-top .3s ease-in-out, padding-bottom .3s;
@@ -105,10 +106,12 @@ a:focus, a:hover {
     }
 
     #mainNav.navbar-shrink {
+        visibility: visible;
         padding-top: 10px;
         padding-bottom: 10px;
         border-bottom: 1px solid rgba(255, 255, 255, .3);
-        background: #000
+        background: url(../img/background-title.png) no-repeat bottom center scroll;
+        /*background: #000*/
     }
 
     #mainNav .nav-link.active {
@@ -128,7 +131,7 @@ a:focus, a:hover {
     padding: 200px 0;
     text-align: center;
     color: #fff;
-    background: url(../img/byzantium-background.jpg) no-repeat bottom center scroll;
+    background: url(../img/background.jpg) no-repeat bottom center scroll;
     background-color: #000;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -171,7 +174,7 @@ a:focus, a:hover {
     padding: 200px 0;
     text-align: center;
     color: white;
-    background: url("../img/intro-bg.jpg") no-repeat bottom center scroll;
+    background: url("../img/background-detail.jpg") no-repeat bottom center scroll;
     background-color: black;
     -webkit-background-size: cover;
     -moz-background-size: cover;

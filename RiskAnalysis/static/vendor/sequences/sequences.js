@@ -1,6 +1,6 @@
 // Dimensions of sunburst.
-var width = 750;
-var height = 750;
+var width = 550;
+var height = 550;
 var radius = Math.min(width, height) /2;
 
 // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
@@ -72,7 +72,7 @@ var arc = d3.svg.arc()
 
 // Use d3.text and d3.csv.parseRows so that we do not need to have a header
 // row, and can receive the csv as an array of arrays.
-d3.text('http://166.111.83.80:8000/static/vendor/sequences/visit-sequences.csv', function(text) {
+d3.text('http://166.111.83.76:8000/static/vendor/sequences/visit-sequences.csv', function(text) {
   var csv = d3.csv.parseRows(text);
   var json = buildHierarchy(csv);
   createVisualization(json);

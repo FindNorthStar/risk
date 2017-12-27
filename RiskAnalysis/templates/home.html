@@ -132,7 +132,7 @@
 </head>
 
 
-<body id="page-top">
+<body id="page-top" style="background: #eee">
 
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
@@ -147,13 +147,16 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="#about">风险维度</a>
+                    <a class="nav-link js-scroll-trigger" href="#background">背景介绍</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="#download">平台分布</a>
+                    <a class="nav-link js-scroll-trigger" href="#dimension">风险维度</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link js-scroll-trigger" href="#contact">平台列表</a>
+                    <a class="nav-link js-scroll-trigger" href="#distribution">平台分布</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link js-scroll-trigger" href="#list">平台列表</a>
                 </li>
             </ul>
         </div>
@@ -163,32 +166,90 @@
 <!-- Intro Header -->
 <header class="masthead">
     <div class="intro-body">
-        <div class="container">
+        <div class="container" style="padding-top: 10%">
             <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <a href="#about" class="btn btn-circle js-scroll-trigger" style="margin-top:210px">
-                        <i class="fa fa-angle-double-down animated"></i>
-                    </a>
+                <div class="col-lg-10 mx-auto">
+                     <div class="input-group col-md-12" style="margin-top:0px; positon:relative">
+                        <input id="search-box" type="text" class="form-control" placeholder="请输入企业名称" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-info btn-search" id="searhButton" onclick="searchName()">查找</button>
+                            </span>
+                        </div>
+
+        <div class="col-lg-12" style="text-align: left; margin-left: auto;margin-right: auto;padding-top: 15px ">
+            <div class="panel panel-default">
+                <!-- /.panel-heading -->
+                <div class="panel-body" style="padding: 0px">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>平台名称</th>
+                                <th>成交量(万元)</th>
+                                <th>平均利率(%)</th>
+                                <th>平均借款期限(月)</th>
+                                <th>投资人数</th>
+                                <th>风险值</th>
+                            </tr>
+                            </thead>
+                            <tbody id="search-table">
+                            <tr>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform?id={{ list_wdzj.0.guotaiid }}">{{ list_wdzj.0.fullname }}</a></td>
+                                <td>{{ list_wdzj.0.tradingvolume }}</td>
+                                <td>{{ list_wdzj.0.avereturn }}</td>
+                                <td>{{ list_wdzj.0.avelimtime }}</td>
+                                <td>{{ list_wdzj.0.loannum }}</td>
+                                <td>{{ list_wdzj.0.riskval }}</td>
+                            </tr>
+                            <tr>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform?id={{ list_wdzj.1.guotaiid }}">{{ list_wdzj.1.fullname }}</a></td>
+                                <td>{{ list_wdzj.1.tradingvolume }}</td>
+                                <td>{{ list_wdzj.1.avereturn }}</td>
+                                <td>{{ list_wdzj.1.avelimtime }}</td>
+                                <td>{{ list_wdzj.1.loannum }}</td>
+                                <td>{{ list_wdzj.1.riskval }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+                    <!--<a href="#about" class="btn btn-circle js-scroll-trigger" style="margin-top:210px">-->
+                        <!--<i class="fa fa-angle-double-down animated"></i>-->
+                    <!--</a>-->
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- About Section -->
-<section id="about" class="content-section text-center" style="padding-top:50px">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <h1>七大风险维度</h1>
-            </div>
-        </div>
+<section id="background" class="download-section1 content-section text-center" style="padding-top:50px;height:100%;padding-bottom: 10px">
+    <div class="container" style="width:50%; float: left">
+        <img src="{{ STATIC_URL }}/static/img/background-intro.JPG" width="100%" height="100%" />
     </div>
-    <div id="mainBubble" style="height: 0px;  border:0px"></div>
+    <div class="container" style="width:50%; float: right">
+        <img src="{{ STATIC_URL }}/static/img/background-risk.JPG" width="100%" height="100%" />
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="dimension" class="content-section text-center" style="padding-top:10px;background: white;padding-bottom: 0px;margin-bottom: 20px">
+
+    <div class="container">
+            <div class="col-lg-12 mx-auto">
+                <h1 style="margin-bottom: 0px">七大风险维度</h1>
+            </div>
+    </div>
+    <div id="mainBubble" style="height: 0px; width: 100%; border:0px"></div>
       
     <script>
         var w = window.innerWidth;
-        var h = Math.ceil(w * 0.7) * 2;
+        var h = Math.ceil(w * 0.7) ;
+//        var h = 200 ;
         var oR = 0;
         var nTop = 0;
 
@@ -221,11 +282,11 @@
                     return "topBubbleAndText_" + i
                 });
 
-            console.log(root);
+            {#console.log(root);#}
             nTop = root.children.length;
             oR = w / (1 + 3 * nTop) * 1.2;
 
-            h = Math.ceil(w / nTop * 2) * 2;
+            h = Math.ceil(w / nTop * 2) * 1.5;
             svgContainer.style("height", h + "px");
 
             var colVals = d3.scale.category10();
@@ -349,7 +410,7 @@
             w = window.innerWidth;
             oR = w / (1 + 3 * nTop) * 1.2;
 
-            h = Math.ceil(w / nTop * 2) * 2;
+            h = Math.ceil(w / nTop * 2) * 1.5;
             svgContainer.style("height", h + "px");
 
             mainNote.attr("y", h - 15);
@@ -498,27 +559,26 @@
 </section>
 
 <!-- Download Section -->
-<section id="download" class="download-section1 content-section text-center" style="padding-top:50px">
+<section id="distribution" class="download-section1 content-section text-center" style="padding-top:10px;margin-top:50px;background: white;height:100%;padding-bottom: 0px;margin-bottom: 20px">
     <div class="container">
         <div class="col-lg-8 mx-auto">
-            <h1>主要P2P平台全国各省市分布情况</h1>
+            <h1>主要P2P平台分布情况</h1>
         </div>
     </div>
+    <div style="width:50%;float:left">
     <div id="tooltip"></div><!-- div to hold tooltip. -->
     <svg width="600" height="520" id="statesvg"></svg> <!-- svg to hold the map. -->
-    <div class="container">
-        <div class="col-lg-8 mx-auto">
-            <h1>各主要P2P平台按省市划分聚类情况</h1>
-        </div>
     </div>
 
-    <svg width="1960" height="800" id="forcesvg">
+    <div style="width:50%;float:right">
+     <svg width="100%" height="500px" id="forcesvg">
         <g id="tooltip2"></g>
     </svg>
+    </div>
 </section>
 
 <!-- Contact Section -->
-<section id="contact" class="content-section text-center" style="padding-top:50px">
+<section id="list" class="content-section text-center" style="padding-top:10px;margin-top:50px;padding-bottom: 0px;background: white">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -528,18 +588,8 @@
     </div>
     <div class="content-wrapper">
         <div class="container-fluid">
-            <!-- Breadcrumbs-->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="#">P2P行业风险分析</a>
-                </li>
-                <li class="breadcrumb-item active">P2P平台列表</li>
-            </ol>
             <!-- Example DataTables Card-->
             <div class="card mb-3">
-                <div class="card-header">
-                    <i class="fa fa-table"></i> Data Table Example
-                </div>
                 <div class="card-body">
                     <div class="table-responsive" style="color:black">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -547,58 +597,33 @@
                             <tr>
                                 <th>平台名称</th>
                                 <th>成交量(万元)</th>
-                                <th>平均参考收益率(%)</th>
+                                <th>平均利率(%)</th>
                                 <th>平均借款期限(月)</th>
-                                <th>注册资本</th>
-                                <th>满标用时(分)</th>
+                                <th>投资人数</th>
+                                <th>风险值</th>
                             </tr>
                             </thead>
                             <tfoot>
                             <tr>
                                 <th>平台名称</th>
                                 <th>成交量(万元)</th>
-                                <th>平均参考收益率(%)</th>
+                                <th>平均利率(%)</th>
                                 <th>平均借款期限(月)</th>
-                                <th>注册资本</th>
-                                <th>满标用时(分)</th>
+                                <th>投资人数</th>
+                                <th>风险值</th>
                             </tr>
                             </tfoot>
                             <tbody>
                             {% for bussiness_info in list_wdzj %}
                             <tr>
-                                <td><a href="{{ LOCAL_BASED_URL }} /platform?id={{ bussiness_info.wdzjinfoid }}">{{ bussiness_info.platform_name }}</a></td>
-                                <td>{{ bussiness_info.amount }}</td>
-                                <td>{{ bussiness_info.incomerate }}</td>
-                                <td>{{ bussiness_info.loanperiod }}</td>
-                                <td>{{ bussiness_info.regcapital }}</td>
-                                <td>{{ bussiness_info.fullloantime }}</td>
+                                <td><a href="{{ LOCAL_BASED_URL }} /platform?id={{ bussiness_info.guotaiid }}">{{ bussiness_info.fullname }}</a></td>
+                                <td>{{ bussiness_info.tradingvolume }}</td>
+                                <td>{{ bussiness_info.avereturn }}</td>
+                                <td>{{ bussiness_info.avelimtime }}</td>
+                                <td>{{ bussiness_info.loannum }}</td>
+                                <td>{{ bussiness_info.riskval }}</td>
                             </tr>
                             {% endfor %}
-
-{#                             <tr>#}
-{#                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>#}
-{#                                <td>System Architect</td>#}
-{#                                <td>Edinburgh</td>#}
-{#                                <td>61</td>#}
-{#                                <td>2011/04/25</td>#}
-{#                                <td>$320,800</td>#}
-{#                            </tr>#}
-{#                             <tr>#}
-{#                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>#}
-{#                                <td>System Architect</td>#}
-{#                                <td>Edinburgh</td>#}
-{#                                <td>61</td>#}
-{#                                <td>2011/04/25</td>#}
-{#                                <td>$320,800</td>#}
-{#                            </tr>#}
-{#                             <tr>#}
-{#                                <td><a href="{{ LOCAL_BASED_URL }} /platform">Tiger Nixon</a></td>#}
-{#                                <td>System Architect</td>#}
-{#                                <td>Edinburgh</td>#}
-{#                                <td>61</td>#}
-{#                                <td>2011/04/25</td>#}
-{#                                <td>$320,800</td>#}
-{#                            </tr>#}
                             </tbody>
                         </table>
                     </div>
@@ -612,7 +637,7 @@
 <!-- Footer -->
 <footer>
     <div class="container text-center">
-        <p>Copyright &copy; 166.111.83.80 2017</p>
+        <p style="color: black">Copyright &copy; 166.111.83.80 2017</p>
     </div>
 </footer>
 
@@ -784,4 +809,51 @@
 
 </script>
 
+<script>
+    function searchName() {
+
+        var companyName = $("#search-box").val();
+
+        {#alert(companyName);#}
+        // 提交ajax的请求
+        $.ajax({
+            url: '/search.json',
+            type: 'POST',
+            data: {company_name:companyName}
+        }).done(function (data){
+            var result = data.search_result;
+
+            var tableBody = $("#search-table");
+
+            var tableHtml = "";
+
+            for (var i in result){
+
+                var business = result[i];
+
+                tableHtml += '<tr><td><a href="{{ LOCAL_BASED_URL }}/platform?id='+business.guotaiid+'">'+business.fullname+'</a></td>' +
+                                '<td>'+business.tradingvolume+'</td>' +
+                                '<td>'+business.avereturn+'</td>' +
+                                '<td>'+business.avelimtime+'</td>' +
+                                '<td>'+business.loannum+'</td>' +
+                                '<td>'+business.riskval+'</td>';
+
+            }
+
+            tableBody.html(tableHtml);
+
+
+        }); // end ajax
+
+    }
+</script>
+
+//add keyboard listener
+<script>
+$(document).keydown(function(event){
+    if(event.keyCode == '13'){
+        $('#searhButton').click();
+    }
+});
+</script>
 </body>

@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^titlewords.json$', app_views.title_words, name='title_words'),
     url(r'^judgementprovince.json$', app_views.judgement_province, name='judgement_province'),
     url(r'^salarylevel.json$', app_views.salary_level, name='salary_level'),
+    url(r'^search.json$', app_views.search, name='search'),
     url(r'^admin/', admin.site.urls),
 
 ]

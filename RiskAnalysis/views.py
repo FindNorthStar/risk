@@ -217,7 +217,6 @@ def income_rate(request):
 
     flot_data = {'income_rate': list_income_rate}
 
-    # return HttpResponse(json.dumps(flot_data), content_type="application/json")
     return JsonResponse(flot_data)
 
 
@@ -421,6 +420,20 @@ def employ_level(request):
 
 # 获取舆情,拼成json
 def news_words(request):
+    stopwords = {}.fromkeys([line.rstrip() for line in open('RiskAnalysis/static/hlt_stop_words.txt')])
+
+    dir_judge_score = 'RiskAnalysis/static/keywords.txt'
+
+    dict_judge_score = {}
+
+    with open(dir_judge_score, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            line_split = line.strip().split(',')
+            keyword = line_split[0]
+            score = int(line_split[1])
+            dict_judge_score[keyword] = score
+
     platform_id = request.session.get('platform_id')
 
     list_company = CompanyList.objects.filter(id=platform_id)
@@ -432,38 +445,69 @@ def news_words(request):
     news_info_short = News.objects.filter(platform_name=platform_name)
     news_info_long = News.objects.filter(platform_name=company_name)
 
+    company_comment = [0,0,0]
     dict_words = {}
 
     for item in news_info_short:
         if str(item.label) != '':
+            score = 0
+
             seg_list = jieba.cut(item.label, cut_all=True)  # jieba分词
             for t in seg_list:
-                if t in dict_words and dict_words[t]<100:
-                    dict_words[t]+=1
-                else:
-                    dict_words[t]=1
+                if len(t) > 1 and t not in stopwords:
+                    if t in dict_words and dict_words[t] < 100:
+                        dict_words[t] += 1
+                    else:
+                        dict_words[t] = 1
+
+                    if t in dict_judge_score:
+                        score += dict_judge_score[t]
+
+            if score == -1:
+                company_comment[0] += 1
+            elif score == 0:
+                company_comment[1] += 1
+            else:
+                company_comment[2] += 1
 
     for item in news_info_long:
         if str(item.label) != '':
+            score = 0
+
             seg_list = jieba.cut(item.label, cut_all=True)  # jieba分词
             for t in seg_list:
-                if t in dict_words and dict_words[t]<100:
-                    dict_words[t]+=1
-                else:
-                    dict_words[t]=1
+                if len(t) > 1 and t not in stopwords:
+                    if t in dict_words and dict_words[t] < 100:
+                        dict_words[t] += 1
+                    else:
+                        dict_words[t] = 1
+
+                    if t in dict_judge_score:
+                        score += dict_judge_score[t]
+
+            if score == -1:
+                company_comment[0] += 1
+            elif score == 0:
+                company_comment[1] += 1
+            else:
+                company_comment[2] += 1
 
     dict_words_sorted = sorted(dict_words.items(), key=lambda d: d[1],reverse=True)
 
     if len(dict_words_sorted) > 100:
         dict_words_sorted = dict_words_sorted[:100]
 
-    flot_data = {'words': dict_words_sorted}
+
+
+    flot_data = {'words': dict_words_sorted,'comments':company_comment}
 
     return JsonResponse(flot_data)
 
 
 # 获取舆情,拼成json
 def title_words(request):
+    stopwords = {}.fromkeys([line.rstrip() for line in open('RiskAnalysis/static/hlt_stop_words.txt')])
+
     platform_id = request.session.get('platform_id')
 
     list_company = CompanyList.objects.filter(id=platform_id)
@@ -481,7 +525,7 @@ def title_words(request):
         if str(item.news_title) != '':
             seg_list = jieba.cut(item.news_title, cut_all=True)  # jieba分词
             for t in seg_list:
-                if len(t)>0:
+                if len(t) > 1 and t not in stopwords:
                     if t in dict_words:
                         dict_words[t] += 1
                     else:
@@ -491,7 +535,7 @@ def title_words(request):
         if str(item.news_title) != '':
             seg_list = jieba.cut(item.news_title, cut_all=True)  # jieba分词
             for t in seg_list:
-                if len(t) > 0:
+                if len(t) > 1 and t not in stopwords:
                     if t in dict_words:
                         dict_words[t] += 1
                     else:
@@ -719,14 +763,74 @@ def salary_level(request):
 
 
 def home(request):
-    list_wdzj = Wdzjinfo.objects.filter(enddate='2017-10-31')
+    list_wdzj = Guotai.objects.filter(tradingdate='2017-09-30')
+
+    list_guotai = []
+
+    # list_wdzj = Wdzjinfo.objects.filter(enddate='2017-10-31')
     for i in range(len(list_wdzj)):
-        company_list = CompanyList.objects.filter(platform=list_wdzj[i].platform_name)
+        company_list = CompanyList.objects.filter(platform=list_wdzj[i].fullname)
 
         if len(company_list) > 0:
-            list_wdzj[i].wdzjinfoid = company_list[0].id
+            list_guotai.append({
+                'guotaiid':company_list[0].id,
+                'fullname':list_wdzj[i].fullname,
+                'tradingvolume':list_wdzj[i].tradingvolume,
+                'avereturn':list_wdzj[i].avereturn,
+                'avelimtime':list_wdzj[i].avelimtime,
+                'loannum':list_wdzj[i].loannum,
+                'riskval':random.randint(10,100)
+                })
 
-    return render(request, 'home.html', {'list_wdzj': list_wdzj})
+    return render(request, 'home.html', {'list_wdzj': list_guotai})
+
+
+def search(request):
+    # req = json.loads(request.body)
+    # req = request.POST
+
+    # print(request.POST['company_name'])
+
+    req = request.POST['company_name']
+
+    list_wdzj = Guotai.objects.filter(tradingdate='2017-09-30',fullname=req)
+
+    list_guotai = []
+
+    if len(list_wdzj) > 0:
+        company_list = CompanyList.objects.filter(platform=list_wdzj[0].fullname)
+
+        if len(company_list) > 0:
+            list_guotai.append({
+                'guotaiid':company_list[0].id,
+                'fullname':list_wdzj[0].fullname,
+                'tradingvolume':list_wdzj[0].tradingvolume,
+                'avereturn':list_wdzj[0].avereturn,
+                'avelimtime':list_wdzj[0].avelimtime,
+                'loannum':list_wdzj[0].loannum,
+                'riskval':random.randint(10,100)
+                })
+
+    if len(list_guotai) == 0:
+        list_wdzj = Guotai.objects.filter(tradingdate='2017-09-30')[:2]
+
+        for i in range(len(list_wdzj)):
+            company_list = CompanyList.objects.filter(platform=list_wdzj[i].fullname)
+
+            if len(company_list) > 0:
+                list_guotai.append({
+                    'guotaiid': company_list[0].id,
+                    'fullname': list_wdzj[i].fullname,
+                    'tradingvolume': list_wdzj[i].tradingvolume,
+                    'avereturn': list_wdzj[i].avereturn,
+                    'avelimtime': list_wdzj[i].avelimtime,
+                    'loannum': list_wdzj[i].loannum,
+                    'riskval': random.randint(10, 100)
+                })
+
+    flot_data = {'search_result': list_guotai}
+
+    return JsonResponse(flot_data)
 
 
 def write_score_csv(law_risk_score,
@@ -852,6 +956,26 @@ def platform(request):
     # print(list_company_info[0].address)  # 地址
     # print(list_company_info[0].register_department)  # 登记机关
 
+    # 股权冻结信息
+    freeze_info_result = Changeinfo.objects.filter(platform_name=company_name)
+    freeze_info_count = len(freeze_info_result)
+
+    # 清算信息
+    liquidation_info_result = Liquidation.objects.filter(platform_name=company_name)
+    liquidation_info_count = len(liquidation_info_result)
+
+    # 行政处罚信息
+    admin_penalty_info_result = Administrationpenalty.objects.filter(platform_name=company_name)
+    admin_penalty_info_count = len(admin_penalty_info_result)
+
+    # 失信公告
+    fail_credit_info_result = Failcredit.objects.filter(company_name=company_name)
+    fail_credit_info_count = len(fail_credit_info_result)
+
+    # 执行公告统计
+    ducument_execute_info_result = Documentexecute.objects.filter(platform_name=company_name)
+    document_execute_info_count = len(ducument_execute_info_result)
+
     # 判决文书类型信息
     law_result = Documentjudgment.objects.values("platform_name", "case_brief").annotate(
         case_count=Count("case_brief")).filter(platform_name=company_name)
@@ -863,6 +987,9 @@ def platform(request):
             list_law_type.append({'case_brief': item['case_brief'], 'case_count': item['case_count']})
 
     list_law_info = Documentjudgment.objects.filter(platform_name=company_name)
+
+    # 裁判文书统计
+    document_judgement_info_count = len(list_law_info)
 
     # 判决公告信息
     # document_execute_info = Documentexecute.objects.filter(platform_name=company_name)[:10]
@@ -911,32 +1038,42 @@ def platform(request):
     dict_cases_sorted = sorted(dict_cases.items(), key=lambda d: d[0])
 
     # 企业变更信息
-    change_info = Changeinfo.objects.filter(platform_name=company_name)[:15]
+    change_info = Changeinfo.objects.filter(platform_name=company_name)
+    change_info_count = len(change_info)
 
     # 纳税信用等级
     tax_credit_info = Taxcreditinfo.objects.filter(platform_name=company_name)
+    tax_credit_info_count = len(tax_credit_info)
 
     # 欠税信息
     tax_info = Taxinfo.objects.filter(platform_name=company_name)
+    tax_info_count = len(tax_info)
 
     # 涉税处罚信息
     tax_penalty_info = Taxpenalty.objects.filter(platform_name=company_name)
+    tax_penalty_info_count = len(tax_penalty_info)
 
     # 纳税非正常户
     abnormal_tax_info = Abnormaltaxinfo.objects.filter(platform_name=company_name)
+    abnormal_tax_info_count = len(abnormal_tax_info)
 
     # 经营信息
-    wdzj_info = Wdzjinfo.objects.filter(platform_name=platform_name, startdate__lt=date(2017, 10, 10))
+    # wdzj_info = Wdzjinfo.objects.filter(platform_name=platform_name, startdate__lt=date(2017, 10, 10))
+    wdzj_info = Guotai.objects.filter(fullname=platform_name)
 
     # 招聘信息
-    employ_info = Employinfo.objects.values("platform_name", "startmonth").annotate(
-        case_count=Count("startmonth")).filter(platform_name=company_name)
+    employ_info = Employinfo.objects.filter(platform_name=company_name)
+
+    # for item in employ_info:
+    #     print(item.title,item.salary,item.startdate)
 
     # ICP备案信息
     icp_info = Icp.objects.filter(company_name=company_name)
+    icp_info_count = len(icp_info)
 
     # 银行存管信息
     bank_depository_info = Bankdepository.objects.filter(company_name=company_name)
+    bank_depository_info_count = len(bank_depository_info)
 
     # 舆情信息
     news_info_short = News.objects.filter(platform_name=platform_name)
@@ -944,7 +1081,7 @@ def platform(request):
 
     news_info = news_info_short | news_info_long
 
-    news_info = news_info[:20]
+    news_info = news_info
 
     # 随机生成7个维度得分
     law_risk_score = random.randint(10, 100)
@@ -976,17 +1113,17 @@ def platform(request):
 
     return render_to_response('platform.html', {'company_info': company_info,
                                                 'law_type_info': list_law_type,
-                                                'change_info': change_info,
+                                                'change_info': change_info[:10],
                                                 'icp_info': icp_info,
                                                 'bank_depository_info': bank_depository_info,
                                                 'case_info': dict_cases_sorted,
                                                 'list_law_info': list_law_info[:10],
-                                                'wdzj_info': wdzj_info,
-                                                'tax_credit_info': tax_credit_info,
-                                                'tax_info': tax_info,
-                                                'tax_penalty_info': tax_penalty_info,
-                                                'abnormal_tax_info': abnormal_tax_info,
-                                                'news_info': news_info,
+                                                'wdzj_info': wdzj_info[:10],
+                                                'tax_credit_info': tax_credit_info[:10],
+                                                'tax_info': tax_info[:10],
+                                                'tax_penalty_info': tax_penalty_info[:10],
+                                                'abnormal_tax_info': abnormal_tax_info[:10],
+                                                'news_info': news_info[:10],
                                                 'law_risk_score': law_risk_score,
                                                 'admin_risk_score': admin_risk_score,
                                                 'business_risk_score': business_risk_score,
@@ -995,5 +1132,19 @@ def platform(request):
                                                 'outline_risk_score': outline_risk_score,
                                                 'employ_risk_score': employ_risk_score,
                                                 'total_risk_score': total_risk_score,
-                                                'platform_name':platform_name
+                                                'platform_name':platform_name,
+                                                'freeze_info_count':freeze_info_count,
+                                                'liquidation_info_count':liquidation_info_count,
+                                                'admin_penalty_info_count':admin_penalty_info_count,
+                                                'change_info_count':change_info_count,
+                                                'fail_credit_info_count':fail_credit_info_count,
+                                                'document_execute_info_count':document_execute_info_count,
+                                                'document_judgement_info_count':document_judgement_info_count,
+                                                'tax_info_count':tax_info_count,
+                                                'tax_penalty_info_count':tax_penalty_info_count,
+                                                'tax_credit_info_count':tax_credit_info_count,
+                                                'abnormal_tax_info_count':abnormal_tax_info_count,
+                                                'icp_info_count':icp_info_count,
+                                                'bank_depository_info_count':bank_depository_info_count,
+                                                'employ_info':employ_info[:10]
                                                 })
